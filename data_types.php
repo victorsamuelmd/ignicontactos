@@ -9,17 +9,28 @@
   */
 class Usuario
  {
-     private var $email;
-     private var $username;
-     private var $password;
+     private $email;
+     private $username;
+     private $password;
 
      function __construct($username, $password, $email)
      {
-         this->email = $email;
-         this->username = $username;
-         this->password = $password;
+         if (usuario_valido($username, $password, $email)){
+            $this->email = $email;
+            $this->username = $username;
+            $this->password = $password;
+         } else {
+             trigger_error("Existe error en los datos suministrados", E_USER_ERROR);
+         }
      }
 
+     private function usuario_valido($username, $password, $email)
+     {
+         if (filter_var($email, FILTER_VALIDATE_EMAIL) && validar_password($password) && validar_nombre($username)){
+             return true;
+         }
+         return false;
+     }
   
  }
  
@@ -31,7 +42,17 @@ class Usuario
      
      function __construct($nombres, $apellidos)
      {
-         this->nombres = $nombres;
-         this->apellidos = $apellidos;
+         $this->nombres = $nombres;
+         $this->apellidos = $apellidos;
      }
+ }
+
+ function validar_password($password)
+ {
+     return preg_match('/^[\w\d.?]{6,40}$/', $password);
+ }
+
+ function validar_nombre($nombres)
+ {
+     return preg_match('/^\w{2,50}/');
  }
