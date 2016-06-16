@@ -8,11 +8,7 @@ if (isset($_SESSION['username'])){
     header('Location: /contactos/autenticar.php');
 }
 
-$contactos = array(
-    new Contacto('Victor', 'Mosquera'),
-    new Contacto('Daniel', 'Mosquera'),
-    new Contacto('Manuel', 'Lopez') 
-    );
+
 
 ?>
 <!doctype html>
