@@ -39,11 +39,17 @@ class Usuario
   */
  class Contacto
  {
+     public static $cuenta = 0;
+     var $nombres;
+     var $apellidos;
+     var $id;
      
      function __construct($nombres, $apellidos)
      {
          $this->nombres = $nombres;
          $this->apellidos = $apellidos;
+         $this->id = self::$cuenta;
+         self::$cuenta = self::$cuenta + 1;
      }
  }
 
@@ -56,3 +62,9 @@ class Usuario
  {
      return preg_match('/^\w{2,50}/');
  }
+
+ $contactos = array(
+    new Contacto('Victor', 'Mosquera'),
+    new Contacto('Daniel', 'Mosquera'),
+    new Contacto('Manuel', 'Lopez') 
+);
