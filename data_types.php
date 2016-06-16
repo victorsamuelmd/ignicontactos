@@ -9,13 +9,13 @@
   */
 class Usuario
  {
-     private $email;
-     private $username;
-     private $password;
+     public $email;
+     public $username;
+     public $password;
 
      function __construct($username, $password, $email)
      {
-         if (usuario_valido($username, $password, $email)){
+         if ($this->usuario_valido($username, $password, $email)){
             $this->email = $email;
             $this->username = $username;
             $this->password = $password;
@@ -60,7 +60,7 @@ class Usuario
 
  function validar_nombre($nombres)
  {
-     return preg_match('/^\w{2,50}/');
+     return preg_match('/^\w{2,50}/', $nombres);
  }
 
  $contactos = array(
