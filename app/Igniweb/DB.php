@@ -11,7 +11,7 @@ class DB
     /**
      * Inicializa la base de datos estableciendo una conexion
      *
-     * @return void
+     * @return DB
      */
     public function __construct()
     {
@@ -42,14 +42,18 @@ class DB
     }
     
     public function guardar_usuario(Usuario $user){
-        $stmt = $this->db->prepare("insert into usuarios (username,password,email) 
-            values (:username, :password, :email)");
-        $stmt->execute($user->asArray());
+        if ( ! $this->obtener_usuario($user->asArray()['username'])) {
+            $stmt = $this->db->prepare("insert into usuarios (username,password,email) 
+                values (:username, :password, :email)");
+            $stmt->execute($user->asArray());
+        } else {
+            throw new InvalidArgumentException("El usuario ya existe");
+        }
     }
 
     /**
-        * Devuelve un usuario si este existe en la base de datos, requiere el nombre
-        * de usuario como primer parámetro.
+     * Devuelve un usuario si este existe en la base de datos, requiere el nombre
+     * de usuario como primer parámetro.
      *
      * @return PDO query object
      */
@@ -63,7 +67,7 @@ class DB
     }
     
 
-    public function guardar_contacto($username, Contacto $contact){
+    public function guardar_contacto(Contacto $contact){
         $stmt = $this->db->prepare("insert into contactos (id,nombre,apellidos,
             telefono,email,categoria, fecha_nacimiento,pais,departamento,ciudad,
             direccion,coordenadas,notas,id_usuario)

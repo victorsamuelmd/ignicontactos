@@ -15,7 +15,7 @@ class Usuario implements \JsonSerializable
     private $username;
     private $password;
 
-    function __construct($username, $password, $email)
+    public function __construct($username, $password, $email)
     {
         if ($this->usuario_valido($username, $password, $email)){
             $this->email = $email;
