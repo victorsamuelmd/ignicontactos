@@ -51,10 +51,25 @@ class Usuario implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        return Array(
+        return array(
             "username" => $this->username,
             "email" => $this->email
         );
     }
+
+    /**
+     * Retorna el usuario en forma de array
+     *
+     * @return Array
+     */
+    public function asArray()
+    {
+        return array(
+            "username" => $this->username,
+            "password" => $this->password,
+            "email" => $this->email
+        );
+    }
+    
 
 }
