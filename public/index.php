@@ -4,15 +4,20 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use Aura\Router\RouterContainer as RouterContainer;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\Response\JsonResponse;
+use Zend\Diactoros\Response\HtmlResponse;
+use Zend\Diactoros\ServerRequestFactory;
 use Zend\Diactoros\Server;
 use Igniweb\Usuario;
+use Igniweb\Contacto;
 use Igniweb\DB;
+
+Twig_Autoloader::register();
 
 function main()
 {
     //Conexion a base de datos
     try {
-        $database = new DB();
+        $db = new DB();
     } catch (PDOException $e) {
         print "No se conecta a la base de datos: $e";
     }
@@ -21,27 +26,35 @@ function main()
 
     $map = $routerContainer->getMap();
 
-    $map->get('user', '/user/{username}', function ($request, $response) use ($database) {
+    $map->get('user', '/user/{username}', function ($request, $response) use ($db) {
         $username = (string) $request->getAttribute('username');
-        $user = $database->obtener_usuario($username);
+        $user = $db->obtener_usuario($username);
         return new JsonResponse($user);
     });
 
-    $map->get('home', '/home', function ($request, $response) {
+    $map->post('contacto.nuevo', '/api/contacto/nuevo', function ($req, $res) use ($db) {
+        $c = json_decode($req->getBody(), true);
         try {
-            $usuario = new Usuario("victorsamuel",
-                                   "$%&.,abcd1123", "victorsamuel@mail.com");
-
-            $response = new JsonResponse($usuario);
+            $contacto = new Contacto($c['nombres'], $c['apellidos'], $c['id_usuario']);
+            return new JsonResponse($contacto);
         } catch (InvalidArgumentException $e) {
-            $response = new JsonResponse($e->getMessage());
+            return new JsonResponse(array('error' => $e->getMessage()), 500);
         }
-        return $response;
+    });
+
+    $map->post('usuario.nuevo', '/api/usuario/nuevo', function ($req, $res) use ($db) {
+        $usr = json_decode($req->getBody(), true);
+        try {
+            $usuario = new Usuario($c['username'], $c['password'], $usr['email']);
+            $db->guardar_usuario($usuario);
+        } catch (InvalidArgumentException $e) {
+            return new JsonResponse(array('error' => $e->getMessage()), 500);
+        }
     });
 
     $matcher = $routerContainer->getMatcher();
 
-    $request = Zend\Diactoros\ServerRequestFactory::fromGlobals(
+    $request = ServerRequestFactory::fromGlobals(
         $_SERVER,
         $_GET,
         $_POST,
