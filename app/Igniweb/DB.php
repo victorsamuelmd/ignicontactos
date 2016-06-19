@@ -15,16 +15,17 @@ class DB
      */
     public function __construct()
     {
-        $this->db = new \PDO('mysql:host=mysql;dbname=test',
-            getenv('DB_USERNAME'), getenv('DB_PASSWORD'));
+        $this->db = new \PDO('mysql:host=mariadb;dbname=homestead',
+            'homestead', 'secret');
 
         $this->db->exec("create table if not exists usuarios (
-            username varchar(50),
+            username varchar(50) primary key,
             password varchar(256),
-            email varchar(200)
+            email varchar(200) not null unique
         );");
 
         $this->db->exec("create table if not exists contactos (
+            id int primary key auto_increment,
             nombres varchar(200) not null,
             apellidos varchar(200) not null,
             telefono varchar(20),
