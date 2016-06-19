@@ -70,6 +70,17 @@ class Usuario implements \JsonSerializable
             "email" => $this->email
         );
     }
+
+    /**
+     * undocumented function
+     *
+     * @return string
+     */
+    public function get_username()
+    {
+        return $this->username;
+    }
+    
     
 
 }

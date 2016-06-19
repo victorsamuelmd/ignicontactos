@@ -26,13 +26,42 @@ function main()
 
     $map = $routerContainer->getMap();
 
-    $map->get('user', '/user/{username}', function ($request, $response) use ($db) {
+    $map->get('get.usuario', '/usuario/{username}', function ($request, $response) use ($db) {
         $username = (string) $request->getAttribute('username');
         $user = $db->obtener_usuario($username);
         return new JsonResponse($user);
     });
 
-    $map->post('contacto.nuevo', '/api/contacto/nuevo', function ($req, $res) use ($db) {
+    $map->post('post.usuario', '/usuario/nuevo', function ($req, $res) use ($db) {
+        $usr = json_decode($req->getBody(), true);
+        try {
+            $usuario = new Usuario($usr['username'], $usr['password'], $usr['email']);
+            $db->guardar_usuario($usuario);
+        } catch (InvalidArgumentException $e) {
+            return new JsonResponse(array('error' => $e->getMessage(), 'data' => $usr), 500);
+        }
+    });
+
+    /*
+     * CRUD para la tabla de contactos
+     * */
+    $map->get('get.contacto.todos', '/{username}/contacto/todos', function ($req, $res) use ($db) {
+        $username = (string) $req->getAttribute('username');
+        return new JsonResponse($db->obtener_contacto_todos($username));
+    });
+
+    $map->get('get.contacto', '/{username}/contacto/{id}', function ($req, $res) use ($db) {
+        $username = (string) $req->getAttribute('username');
+        $id = (int) $req->getAttribute('id');
+        $contacto = $db->obtener_contacto($username, $id);
+        if ($contacto){
+            return new JsonResponse($contacto);
+        } else {
+            return new JsonResponse(array("error" => "El contacto con id $id no existe"), 404);
+        }
+    });
+
+    $map->post('post.contacto', '/{username}/contacto/nuevo', function ($req, $res) use ($db) {
         $c = json_decode($req->getBody(), true);
         try {
             $contacto = new Contacto($c['nombres'], $c['apellidos'], $c['id_usuario']);
@@ -42,14 +71,19 @@ function main()
         }
     });
 
-    $map->post('usuario.nuevo', '/api/usuario/nuevo', function ($req, $res) use ($db) {
-        $usr = json_decode($req->getBody(), true);
-        try {
-            $usuario = new Usuario($c['username'], $c['password'], $usr['email']);
-            $db->guardar_usuario($usuario);
-        } catch (InvalidArgumentException $e) {
-            return new JsonResponse(array('error' => $e->getMessage()), 500);
-        }
+    $map->put('put.contacto', '/{username}/contacto/{id}', function ($req, $res) use ($db) {
+        $username = (string) $req->getAttribute('username');
+        $id = (int) $req->getAttribute('id');
+        $contacto = json_decode($req->getBody(), true);
+        $stat = $db->actualizar_contacto($username, $id, $contacto);
+        return new JsonResponse($stat);
+    });
+
+    $map->delete('delete.contacto', '/{username}/contacto/{id}', function ($req, $res) use ($db) {
+        $username = (string) $req->getAttribute('username');
+        $id = (int) $req->getAttribute('id');
+
+        return new JsonResponse($db->borrar_contacto($username, $id));
     });
 
     $matcher = $routerContainer->getMatcher();
