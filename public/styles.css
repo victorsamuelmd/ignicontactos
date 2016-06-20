@@ -5,10 +5,26 @@
 }
 
 body {
-    width: 960px;
     margin: 0 auto;
 }
 
 .error {
     background-color: red;
+}
+
+.pure-menu {
+    background-color: #f8f8f8;
+}
+
+.lista-contactos {
+    background-color: #f0f0f0;
+}
+
+.lista-contactos > ul {
+    list-style-type: none;
+}
+
+.lista-contactos > ul > li {
+    background: white;
+    display: block;
 }

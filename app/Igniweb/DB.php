@@ -18,8 +18,8 @@ class DB
      */
     public function __construct()
     {
-        $this->db = new PDO('mysql:host=mariadb;dbname=homestead',
-            'homestead', 'secret');
+        $this->db = new PDO('mysql:host=localhost;dbname=test',
+            'root');
 
         $this->db->exec("create table if not exists usuarios (
             username varchar(50) primary key,
@@ -68,6 +68,15 @@ class DB
                                     where `username` = :username");
         $stmt->execute(array('username' => $username));
         return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function validar_usuario($username, $password)
+    {
+        $stmt = $this->db->prepare("select `username` from usuarios
+                                    where `username` = :username
+                                    and `password` = :password");
+        $stmt->execute(array('username' => $username, 'password' => hash('sha256', $password)));
+        return $stmt->fetch();
     }
 
     /**

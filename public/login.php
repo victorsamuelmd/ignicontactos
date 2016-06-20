@@ -19,21 +19,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 ?><!doctype html>
 <?php if (true){ ?>
 <html>
-<head>
-<title>Ignicontactos</title>
-</head>
-<body>
-    <h1>Autenticar</h1>
-<form action="login.php" method="post">
-<input type="text" placeholder="username" name="username">
-<input type="password" placeholder="Password" name="password">
-<input type="submit" value="Autenticar">
-</form>
-<p><?php
-echo $error;
-?>
-</p>
-<p>No tiene cuenta: <a href="registro.php">Registrarse</a></p>
-</body>
+    <head>
+        <title>Ignicontactos</title>
+        <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <body class="pure-g">
+            <div class="pure-u-1-3">
+            </div>
+            <div class="pure-u-1-3">
+                <h1>Ingresar</h1>
+                <form action="login.php" method="post" class="pure-form pure-form-stacked">
+                    <input type="text" placeholder="username" name="username">
+                    <input type="password" placeholder="Password" name="password">
+                    <input type="submit" value="Autenticar" class="pure-button pure-button-primary">
+                </form>
+                <p>
+                    <?php echo $error; ?>
+                </p>
+                <p>No tiene cuenta: <a href="registro.php">Registrarse</a></p>
+            </div>
+            <div class="pure-u-1-3">
+            </div>
+        </body>
 </html>
 <?php } ?>

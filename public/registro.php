@@ -21,19 +21,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 }
 ?><!doctype html>
 <html>
-<head>
-<title>Ignicontactos | Registro</title>
-<link rel="stylesheet" href="styles.css">
-</head>
-<body>
-<form action="registro.php" method="post">
-<input type="text" placeholder="Nombre Usuario" name="username">
-<input type="email" placeholder="Email" name="email">
-<input type="password" placeholder="Password" name="password">
-<input type="submit" value="Registrarse">
-</form>
-<?php if (isset($_GET['error'])) { ?>
-    <p class="error"><?php echo $_GET['error']; ?></p>
-<?php } ?>
-</body>
+    <head>
+        <title>Ignicontactos | Registro</title>
+        <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body class="pure-g">
+        <div class="pure-u-1-3">
+        </div>
+        <div class="pure-u-1-3">
+            <h1>Registrarse</h1>
+            <form action="registro.php" method="post" class="pure-form pure-form-stacked">
+                <input type="text" placeholder="Nombre Usuario" name="username">
+                <input type="email" placeholder="Email" name="email">
+                <input type="password" placeholder="Password" name="password">
+                <input type="submit" value="Registrarse" class="pure-button pure-button-primary">
+            </form>
+        <?php if (isset($_GET['error'])) { ?>
+        <p class="error"><?php echo $_GET['error']; ?></p>
+        <?php } ?>
+        </div>
+        <div class="pure-u-1-3">
+        </div>
+    </body>
 </html>
