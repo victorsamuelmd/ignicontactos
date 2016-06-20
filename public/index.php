@@ -139,5 +139,10 @@ function main()
     }
 }
 
-main();
+session_start();
+if (isset($_SESSION['username']) && $_SESSION['username'] != ''){
+    main();
+} else {
+    echo json_encode(['error' => 'No autorizado']);
+}
 
