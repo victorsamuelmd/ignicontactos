@@ -49,7 +49,7 @@ class DB
         if ( ! $this->obtener_usuario($user->get_username())) {
             $stmt = $this->db->prepare("insert into usuarios (username,password,email) 
                 values (:username, :password, :email)");
-            $stmt->execute($user->asArray());
+            return $stmt->execute($user->asArray());
         } else {
             throw new InvalidArgumentException("El usuario ya existe");
         }
@@ -83,11 +83,15 @@ class DB
     }
     
     public function guardar_contacto(Contacto $contact){
-        $stmt = $this->db->prepare("insert into contactos (id,nombre,apellidos,
-            telefono,email,categoria, fecha_nacimiento,pais,departamento,ciudad,
-            direccion,coordenadas,notas,id_usuario)
-            values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-        $stmt->execute();
+        $keys = trim(reduce_left($contact->asArray(), function($value, $index, $collection, $reduction) {
+            return $reduction . "`$index`,";
+        }), ",");
+        $values = trim(reduce_left($contact->asArray(), function($value, $index, $collection, $reduction) {
+            return $reduction . ":$index,";
+        }), ",");
+        $sql = "insert into contactos ($keys) values ($values)";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute($contact->asArray());
     }
 
     /**
@@ -128,14 +132,12 @@ class DB
     public function actualizar_contacto($username, $id, Array $datos)
     {
         $str = trim(reduce_left($datos, function($value, $index, $collection, $reduction) {
-            return $reduction . "`$index` = '$value',";
+            return $reduction . "`$index` = :$index,";
         }), ",");
-        $sql = "update contactos set $str where id = ?";
+        $datos['id'] = $id;
+        $sql = "update contactos set $str where id = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->execute(array($id));
-
-        return $this->obtener_contacto($username, $id);
-        
+        return $stmt->execute($datos);
     }
     
     

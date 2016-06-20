@@ -2,3 +2,6 @@
 *.swp
 /vendor/
 .DS_Store
+.tern-project
+composer.lock
+.phpcomplete_extended/

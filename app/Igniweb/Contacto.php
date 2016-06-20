@@ -39,4 +39,28 @@ class Contacto
         }
     }
     
+    /**
+     * Retorna el contacto como una lista asociativa
+     *
+     * @return Array
+     */
+    public function asArray()
+    {
+        return [
+            'nombres' => $this->nombres,
+            'apellidos' => $this->apellidos,
+            'telefono' => $this->telefono,
+            'email' => $this->email,
+            'categoria' => $this->categoria,
+            'fecha_nacimiento' => $this->fecha_nacimiento,
+            'pais' => $this->pais,
+            'departamento' => $this->departamento,
+            'ciudad' => $this->ciudad,
+            'direccion' => $this->direccion,
+            'coordenadas' => $this->coordenadas,
+            'notas' => $this->notas,
+            'id_usuario' => $this->id_usuario
+        ];
+    }
+    
 }

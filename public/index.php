@@ -36,7 +36,7 @@ function main()
         $usr = json_decode($req->getBody(), true);
         try {
             $usuario = new Usuario($usr['username'], $usr['password'], $usr['email']);
-            $db->guardar_usuario($usuario);
+            return new JsonResponse($db->guardar_usuario($usuario));
         } catch (InvalidArgumentException $e) {
             return new JsonResponse(array('error' => $e->getMessage(), 'data' => $usr), 500);
         }
@@ -62,10 +62,22 @@ function main()
     });
 
     $map->post('post.contacto', '/{username}/contacto/nuevo', function ($req, $res) use ($db) {
+        $username = (string) $req->getAttribute('username');
         $c = json_decode($req->getBody(), true);
         try {
-            $contacto = new Contacto($c['nombres'], $c['apellidos'], $c['id_usuario']);
-            return new JsonResponse($contacto);
+            $contacto = new Contacto($c['nombres'], $c['apellidos'], $username);
+            $contacto->telefono = isset($c['telefono']) ? $c['telefono'] : null;
+            $contacto->email = isset($c['email']) ? $c['email'] : null;
+            $contacto->categoria = isset($c['categoria']) ? $c['categoria'] : null;
+            $contacto->fecha_nacimiento = isset($c['fecha_nacimiento']) ? $c['fecha_nacimiento'] : null;
+            $contacto->pais = isset($c['pais']) ? $c['pais'] : null;
+            $contacto->departamento = isset($c['departamento']) ? $c['departamento'] : null;
+            $contacto->ciudad = isset($c['ciudad']) ? $c['ciudad'] : null;
+            $contacto->direccion = isset($c['direccion']) ? $c['direccion'] : null;
+            $contacto->coordenadas = isset($c['coordenadas']) ? $c['coordenadas'] : null;
+            $contacto->notas = isset($c['notas']) ? $c['notas'] : null;
+
+            return new JsonResponse($db->guardar_contacto($contacto));
         } catch (InvalidArgumentException $e) {
             return new JsonResponse(array('error' => $e->getMessage()), 500);
         }
