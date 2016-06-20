@@ -1,0 +1,10 @@
+.custom-restricted {
+    height: 160px;
+    border: 1px solid gray;
+    border-radius: 4px;
+}
+
+body {
+    width: 960px;
+    margin: 0 auto;
+}
