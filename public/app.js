@@ -1,7 +1,7 @@
 (function(){
     'use strict';
 
-    angular.module('ignicontactos', ['ngCookies'])
+    angular.module('ignicontactos', ['ngCookies', 'ngMap', 'ngFileUpload'])
 
         .controller('ContactosListController', function ContactosListController($http, $scope, $cookies){
             $scope.contactos = [];
@@ -19,6 +19,7 @@
             });
             $scope.$on('contactoBorrado', function(event, data){
                 Materialize.toast('Contacto borrado exitosamente', 5000);
+                $scope.selectedContacto = {};
                 $scope.contactos = $scope.contactos.filter(function(elem){
                     return elem.id !== data;
                 });
@@ -31,6 +32,9 @@
                         $rootScope.$broadcast('contactoBorrado', $scope.selectedContacto.id);
                     });
             }
+            $scope.editarContacto = function(){
+                $rootScope.$broadcast('editarContacto', $scope.selectedContacto);
+            }
         })
         .controller('ContactoCrearController', function ContactoCrearController($http, $scope, $rootScope, $cookies){
             $scope.contacto = {};
@@ -42,6 +46,18 @@
                         $scope.contacto = {};
                     });
             }
+            $scope.guardarCambios = function(){
+                $http({method: 'PUT', url: '/' + $cookies.get('username') + '/contacto/' + $scope.contacto.id, data: $scope.contacto})
+                    .then(function(response){
+                        $('#contacto-form').closeModal();
+                        $scope.contacto = {};
+                    });
+            }
+            $scope.$on('editarContacto', function(event, data) {
+                $('#contacto-form').openModal();
+                $scope.contacto = data;
+                console.log(data);
+            });
         });
 })();
 $(document).ready(function(){
