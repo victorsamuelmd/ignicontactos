@@ -36,7 +36,7 @@
                 $rootScope.$broadcast('editarContacto', $scope.selectedContacto);
             }
         })
-        .controller('ContactoCrearController', function ContactoCrearController($http, $scope, $rootScope, $cookies){
+        .controller('ContactoCrearController', function ContactoCrearController($http, $scope, $rootScope, $cookies, Upload){
             $scope.contacto = {};
             $scope.crearContacto = function(){
                 $http.post('/' + $cookies.get('username') + '/contacto/nuevo', $scope.contacto)
@@ -58,6 +58,19 @@
                 $scope.contacto = data;
                 console.log(data);
             });
+            $scope.upload = function (file) {
+                Upload.upload({
+                    url: '/' + $cookies.get('username') + '/images',
+                    data: {file: file, 'username': $scope.username}
+                }).then(function (resp) {
+                    console.log('Success ' + resp.config.data.file.name + 'uploaded. Response: ' + resp.data);
+                }, function (resp) {
+                    console.log('Error status: ' + resp.status);
+                }, function (evt) {
+                    var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
+                    console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
+                });
+            };
         });
 })();
 $(document).ready(function(){

@@ -143,9 +143,9 @@
                             <label for="contacto.notas">Notas:</label>
                         </div>
                     </div>
-                    <div class="button" ngf-select ng-model="file" name="file" ngf-pattern="'image/*'"
+                    <div class="btn" ngf-select="upload($file)" ng-model="file" name="file" ngf-pattern="'image/*'"
     ngf-accept="'image/*'" ngf-max-size="20MB" ngf-min-height="100" 
-    ngf-resize="{width: 100, height: 100}">Select</div>
+    ngf-resize="{width: 100, height: 100}">Imagen de Contacto</div>
                     <a ng-click="crearContacto()" class="waves-effect waves-light btn"><i class="material-icons right">done</i>Crear</a>
                     <a ng-click="guardarCambios()" class="waves-effect waves-light btn"><i class="material-icons right">done</i>Guardar Cambios</a>
                 </form>
