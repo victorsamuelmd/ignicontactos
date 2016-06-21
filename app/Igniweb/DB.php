@@ -3,6 +3,7 @@
 use PDO;
 use InvalidArgumentException;
 use function Functional\reduce_left;
+
 /**
  * Class DB
  * @author victorsamuelmd
@@ -18,7 +19,8 @@ class DB
      */
     public function __construct()
     {
-        $this->db = new PDO('mysql:host=mariadb;dbname=homestead', 'homestead', 'secret');
+        $this->db = new PDO('mysql:host=localhost;dbname=test', 'root');
+        //$this->db = new PDO('mysql:host=mariadb;dbname=homestead', 'homestead', 'secret');
 
     }
 
@@ -111,7 +113,10 @@ class DB
      */
     public function obtener_contacto_todos($username)
     {
-        $stmt = $this->db->prepare("select * from contactos where `id_usuario` = :username");
+        $stmt = $this->db->prepare("select 
+            `nombres`, `apellidos`, `telefono`, `email`, `categoria`, `fecha_nacimiento`,
+            `pais`, `departamento`, `ciudad`, `direccion`, `coordenadas`, `notas`, `id`
+            FROM contactos WHERE `id_usuario` = :username");
         $stmt->execute(array('username' => $username));
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -124,14 +129,8 @@ class DB
      * @return bool
      */
     public function guardar_contacto(Contacto $contact){
-        function envolver_elementos($list, $pre = '', $pos = '') {
-            return trim(reduce_left($list, function($value, $index, $collection, $reduction) use ($pre, $pos) {
-                return $reduction . $pre . $index . $pos;
-            }), ",");
-        }
-
-        $keys = envolver_elementos($contact->asArray(), '`', '`,');
-        $values = envolver_elementos($contact->asArray(), ':', ',');
+        $keys = $this->envolver_elementos($contact->asArray(), '`', '`,');
+        $values = $this->envolver_elementos($contact->asArray(), ':', ',');
 
         $sql = "insert into contactos ($keys) values ($values)";
         $stmt = $this->db->prepare($sql);
@@ -186,5 +185,11 @@ class DB
     }
     
     
+    private function envolver_elementos($list, $pre = '', $pos = '') {
+        return trim(reduce_left($list, function($value, $index, $collection, $reduction) use ($pre, $pos) {
+            return $reduction . $pre . $index . $pos;
+        }), ",");
+    }
+
 }
 

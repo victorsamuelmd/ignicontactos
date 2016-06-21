@@ -14,12 +14,22 @@
             }
             $scope.$on('contactoCreado', function(event, data){
                 $scope.contactos.push(data);
+                $('#contacto-form').closeModal();
+                Materialize.toast('Contacto creado exitosamente', 5000);
+            });
+            $scope.$on('contactoBorrado', function(event, data){
+                Materialize.toast('Contacto borrado exitosamente', 5000);
+                $scope.contactos = $scope.contactos.filter(function(elem){
+                    return elem.id !== data;
+                });
             });
         })
-        .controller('ContactoDetalleController', function ContactoDetalleController($http, $scope, $cookies){
+        .controller('ContactoDetalleController', function ContactoDetalleController($http, $scope, $cookies, $rootScope){
             $scope.borrarContacto = function(){
                 $http({method: 'DELETE', url: '/' + $cookies.get('username') + '/contacto/' + $scope.selectedContacto.id})
-                    .then(function(data){console.log(data);});
+                    .then(function(data){
+                        $rootScope.$broadcast('contactoBorrado', $scope.selectedContacto.id);
+                    });
             }
         })
         .controller('ContactoCrearController', function ContactoCrearController($http, $scope, $rootScope, $cookies){
@@ -29,7 +39,12 @@
                     .then(function(response){
                         console.log(response.data);
                         $rootScope.$broadcast('contactoCreado', $scope.contacto);
+                        $scope.contacto = {};
                     });
             }
         });
 })();
+$(document).ready(function(){
+    // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
+    $('.modal-trigger').leanModal();
+});
