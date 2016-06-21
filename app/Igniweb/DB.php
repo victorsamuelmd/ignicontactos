@@ -18,9 +18,18 @@ class DB
      */
     public function __construct()
     {
-        $this->db = new PDO('mysql:host=localhost;dbname=test',
-            'root');
+        $this->db = new PDO('mysql:host=mariadb;dbname=homestead', 'homestead', 'secret');
 
+    }
+
+    /**
+     * Crea las tablas necesarias para la aplicación, es suficiente con que se
+     * llame una única vez.
+     *
+     * @return void
+     */
+    public function crear_tablas()
+    {
         $this->db->exec("create table if not exists usuarios (
             username varchar(50) primary key,
             password varchar(256),
@@ -45,6 +54,15 @@ class DB
         );");
     }
     
+    
+    /**
+     * Crear un nuevo usuario que se pasa como primer parámetro a la función.
+     * En caso de que halla un usuario con el mismo nombre de usuario genera un
+     * error de tipo InvalidArgumentException.
+     *
+     * @param user Usuario
+     * @return bool
+     */
     public function guardar_usuario(Usuario $user){
         if ( ! $this->obtener_usuario($user->get_username())) {
             $stmt = $this->db->prepare("insert into usuarios (username,password,email) 
@@ -70,6 +88,13 @@ class DB
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Devuelve si se encuentra un usuario con la combinacion correcta de
+     * username y contraseña.
+     * @param username string
+     * @param password string
+     * @return bool
+     */
     public function validar_usuario($username, $password)
     {
         $stmt = $this->db->prepare("select `username` from usuarios
@@ -91,16 +116,27 @@ class DB
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
+    /**
+     * Guarda el contacto pasado como primer argunmento, en la base de datos.
+     * Devuelve verdadero o falso según halla sido exitosa la operación.
+     *
+     * @param contacto Contacto
+     * @return bool
+     */
     public function guardar_contacto(Contacto $contact){
-        $keys = trim(reduce_left($contact->asArray(), function($value, $index, $collection, $reduction) {
-            return $reduction . "`$index`,";
-        }), ",");
-        $values = trim(reduce_left($contact->asArray(), function($value, $index, $collection, $reduction) {
-            return $reduction . ":$index,";
-        }), ",");
+        function envolver_elementos($list, $pre = '', $pos = '') {
+            return trim(reduce_left($list, function($value, $index, $collection, $reduction) use ($pre, $pos) {
+                return $reduction . $pre . $index . $pos;
+            }), ",");
+        }
+
+        $keys = envolver_elementos($contact->asArray(), '`', '`,');
+        $values = envolver_elementos($contact->asArray(), ':', ',');
+
         $sql = "insert into contactos ($keys) values ($values)";
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute($contact->asArray());
+        $stmt->execute($contact->asArray());
+        return $stmt->errorInfo();
     }
 
     /**
@@ -122,7 +158,7 @@ class DB
     }
     
     /**
-     * Borra el contacto especificado con nombre de usuario y id
+     * Borra el contacto especificado con nombre de usuario y id.
      *
      * @return void
      */
