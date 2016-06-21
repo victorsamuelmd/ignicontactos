@@ -125,6 +125,7 @@ function main()
             break;
         default:
             // 404 NOT FOUND
+            http_response_code(404);
             echo "Not found";
             break;
         }
