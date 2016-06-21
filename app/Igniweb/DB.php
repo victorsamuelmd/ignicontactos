@@ -124,15 +124,19 @@ class DB
      * @return bool
      */
     public function guardar_contacto(Contacto $contact){
-        $keys = trim(reduce_left($contact->asArray(), function($value, $index, $collection, $reduction) {
-            return $reduction . "`$index`,";
-        }), ",");
-        $values = trim(reduce_left($contact->asArray(), function($value, $index, $collection, $reduction) {
-            return $reduction . ":$index,";
-        }), ",");
+        function envolver_elementos($list, $pre = '', $pos = '') {
+            return trim(reduce_left($list, function($value, $index, $collection, $reduction) use ($pre, $pos) {
+                return $reduction . $pre . $index . $pos;
+            }), ",");
+        }
+
+        $keys = envolver_elementos($contact->asArray(), '`', '`,');
+        $values = envolver_elementos($contact->asArray(), ':', ',');
+
         $sql = "insert into contactos ($keys) values ($values)";
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute($contact->asArray());
+        $stmt->execute($contact->asArray());
+        return $stmt->errorInfo();
     }
 
     /**
