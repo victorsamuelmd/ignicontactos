@@ -17,7 +17,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
     } catch (InvalidArgumentException $e){
         $_GET['error'] = $e->getMessage();
+        http_status_code(401);
     }
+    echo error_get_last();
 }
 ?><!doctype html>
 <html>
