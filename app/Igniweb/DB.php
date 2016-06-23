@@ -20,7 +20,7 @@ class DB
     public function __construct()
     {
         $this->db = new PDO('mysql:host=localhost;dbname=test', 'root');
-        //$this->db = new PDO('mysql:host=mariadb;dbname=homestead', 'homestead', 'secret');
+        ////$this->db = new PDO('mysql:host=mariadb;dbname=homestead', 'homestead', 'secret');
 
     }
 
@@ -52,6 +52,7 @@ class DB
             direccion varchar(200),
             coordenadas varchar(30),
             notas varchar(700),
+            imagen varchar(38) default '',
             id_usuario varchar(50) not null
         );");
     }
@@ -115,7 +116,7 @@ class DB
     {
         $stmt = $this->db->prepare("select 
             `nombres`, `apellidos`, `telefono`, `email`, `categoria`, `fecha_nacimiento`,
-            `pais`, `departamento`, `ciudad`, `direccion`, `coordenadas`, `notas`, `id`
+            `pais`, `departamento`, `ciudad`, `direccion`, `coordenadas`, `notas`, `id`, `imagen`
             FROM contactos WHERE `id_usuario` = :username");
         $stmt->execute(array('username' => $username));
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

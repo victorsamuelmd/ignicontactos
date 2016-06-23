@@ -6,12 +6,16 @@
         .controller('ContactosListController', function ContactosListController($http, $scope, $cookies){
             $scope.contactos = [];
             $scope.selectedContacto = {};
+            $scope.imagen = '';
             $http.get('/' + $cookies.get('username') + '/contacto/todos').then(function(response){
                 $scope.contactos = response.data;
             });
             $scope.verDetalle = function(data){
                 $scope.selectedContacto = data;
-            }
+                $http.get('/imagen', {params: {'name': data.imagen}}).then(function(response){
+                    $scope.imagen = response.data.imagen;
+                });
+            };
             $scope.$on('contactoCreado', function(event, data){
                 $scope.contactos.push(data);
                 $('#contacto-form').closeModal();
@@ -31,10 +35,10 @@
                     .then(function(data){
                         $rootScope.$broadcast('contactoBorrado', $scope.selectedContacto.id);
                     });
-            }
+            };
             $scope.editarContacto = function(){
                 $rootScope.$broadcast('editarContacto', $scope.selectedContacto);
-            }
+            };
         })
         .controller('ContactoCrearController', function ContactoCrearController($http, $scope, $rootScope, $cookies, Upload){
             $scope.contacto = {};
@@ -45,14 +49,14 @@
                         $rootScope.$broadcast('contactoCreado', $scope.contacto);
                         $scope.contacto = {};
                     });
-            }
+            };
             $scope.guardarCambios = function(){
                 $http({method: 'PUT', url: '/' + $cookies.get('username') + '/contacto/' + $scope.contacto.id, data: $scope.contacto})
                     .then(function(response){
                         $('#contacto-form').closeModal();
                         $scope.contacto = {};
                     });
-            }
+            };
             $scope.$on('editarContacto', function(event, data) {
                 $('#contacto-form').openModal();
                 $scope.contacto = data;
@@ -63,7 +67,7 @@
                     url: '/' + $cookies.get('username') + '/images',
                     data: {file: file, 'username': $scope.username}
                 }).then(function (resp) {
-                    console.log('Success ' + resp.config.data.file.name + 'uploaded. Response: ' + resp.data);
+                    $scope.contacto.imagen = resp.data.img;
                 }, function (resp) {
                     console.log('Error status: ' + resp.status);
                 }, function (evt) {

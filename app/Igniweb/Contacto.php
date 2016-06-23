@@ -19,6 +19,7 @@ class Contacto
     public $direccion;
     public $coordenadas;
     public $notas;
+    public $imagen;
     private $id_usuario;
 
     /**
@@ -59,6 +60,7 @@ class Contacto
             'direccion' => $this->direccion,
             'coordenadas' => $this->coordenadas,
             'notas' => $this->notas,
+            'imagen' => $this->imagen,
             'id_usuario' => $this->id_usuario
         ];
     }

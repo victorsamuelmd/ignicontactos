@@ -2,10 +2,9 @@
 <html lang="es">
     <head>
         <title>Ignicontactos</title>
-        <script src=""></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
         <script src="https://code.angularjs.org/1.5.7/angular-cookies.min.js"></script>
-        <script src="ng-file-upload-all.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/danialfarid-angular-file-upload/12.0.4/ng-file-upload-all.min.js"></script>
         <script src="ng-map.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
@@ -14,8 +13,6 @@
         <link rel="stylesheet" href="styles.css">
     </head>
     <body ng-app="ignicontactos">
-        <div class="row">
-            <div class="col s12">
                 <nav class="purple darker-2">
                     <div class="nav-wrapper">
                         <a href="home.php" class="brand-logo"><i class="material-icons left">assignment_ind</i>Ignicontactos</a>
@@ -25,14 +22,13 @@
                         </ul>
                     </div>
                 </nav>
-            </div>
-        </div>
 
         <div ng-controller="ContactosListController" class="container section">
             <div class="row">
             <div class="col s4">
-                <div class="pure-form">
-                    <input type="text" placeholder="Filtrar" ng-model="filtro" class="pure-input-1">
+                <div class="input-field">
+                    <input type="text" ng-model="filtro" class="">
+                    <label>Buscar</label>
                 </div>
                 <ul class="collection">
                     <li ng-repeat="contacto in contactos | filter: filtro">
@@ -45,9 +41,11 @@
 
             <div ng-controller="ContactoDetalleController" class="col s8">
                 <div ng-if="selectedContacto.nombres">
-                    <div class="card large purple lighten-2">
+                    <div class="card purple lighten-2">
+                        <div ng-if="imagen" class="card-image">
+                            <img ng-src="{{'data:image/png;base64,' + imagen}}"></img>
+                        </div>
                         <div class="card-content white-text">
-                            <span class="card-title"></span>
                             <span class="card-title activator grey-text text-darken-4">
                                 {{selectedContacto.nombres}} {{selectedContacto.apellidos}}
                                 <i class="material-icons right">more_vert</i></span>
@@ -143,9 +141,12 @@
                             <label for="contacto.notas">Notas:</label>
                         </div>
                     </div>
-                    <div class="btn" ngf-select="upload($file)" ng-model="file" name="file" ngf-pattern="'image/*'"
-    ngf-accept="'image/*'" ngf-max-size="20MB" ngf-min-height="100" 
-    ngf-resize="{width: 100, height: 100}">Imagen de Contacto</div>
+
+                    <div class="btn-flat" ngf-select="upload($file)" ng-model="file" name="file"
+                        ngf-accept="'image/*'" ngf-max-size="20MB" ngf-min-height="100">
+                        Imagen de Contacto
+                    </div>
+
                     <a ng-click="crearContacto()" class="waves-effect waves-light btn"><i class="material-icons right">done</i>Crear</a>
                     <a ng-click="guardarCambios()" class="waves-effect waves-light btn"><i class="material-icons right">done</i>Guardar Cambios</a>
                 </form>

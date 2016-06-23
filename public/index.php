@@ -26,6 +26,11 @@ function main()
 
     $map = $routerContainer->getMap();
 
+
+    /*
+     * Funciones para manejar el acceso a la creación de usuarios y obtención de
+     * información
+     **/
     $map->get('get.usuario', '/usuario/{username}', function ($request, $response) use ($db) {
         $username = (string) $request->getAttribute('username');
         $user = $db->obtener_usuario($username);
@@ -41,6 +46,7 @@ function main()
             return new JsonResponse(array('error' => $e->getMessage(), 'data' => $usr), 500);
         }
     });
+
 
     /*
      * CRUD para la tabla de contactos
@@ -76,6 +82,7 @@ function main()
             $contacto->direccion = isset($c['direccion']) ? $c['direccion'] : null;
             $contacto->coordenadas = isset($c['coordenadas']) ? $c['coordenadas'] : null;
             $contacto->notas = isset($c['notas']) ? $c['notas'] : null;
+            $contacto->imagen = isset($c['imagen']) ? $c['imagen'] : null;
 
             return new JsonResponse($db->guardar_contacto($contacto));
         } catch (InvalidArgumentException $e) {
@@ -97,6 +104,48 @@ function main()
 
         return new JsonResponse($db->borrar_contacto($username, $id));
     });
+
+    /*
+     * Funciones para el manejo de imágenes de contacto
+     **/
+    $map->post('post.imagen', '/{username}/images', function ($req, $res) use ($db)
+    {
+        $file = isset($req->getUploadedFiles()['file']) ? $req->getUploadedFiles()['file'] : null;
+        if (!$file) {
+            return new JsonResponse(array('error' => 'Bad Request'), 400);
+        }
+        $file_name = bin2hex(openssl_random_pseudo_bytes(16)) . '.png';
+        try {
+            $file_path = __DIR__ . '/../img/' . $file_name;;
+            $file->moveTo($file_path);
+            return new JsonResponse(array('img' => $file_name));
+        } catch(InvalidArgumentException $e) {
+            return new JsonResponse(array('error' => $e->getMessage()), 400);
+        } catch(\RuntimeException $e) {
+            return new JsonResponse(array('error' => $e->getMessage()), 500);
+        }
+    });
+
+    $map->get('get.imagen', '/imagen', function ($req, $res) {
+        $file = $req->getQueryParams();
+        return new JsonResponse(array('imagen' => obtener_imagen($file['name'])));
+    });
+
+    /*
+     * Obtiene la imagen si esta exite en la carpeta del sistema y la devuelve
+     * como string base64.
+     *
+     * @param $img_name El nombre de la imagen
+     * @return string|null
+     */
+    function obtener_imagen($img_name)
+    {
+        $file = __DIR__ . '/../img/' . $img_name;
+        if (file_exists($file)) {
+            return base64_encode(file_get_contents($file));
+        }
+        return null;
+    }
 
     $matcher = $routerContainer->getMatcher();
 
