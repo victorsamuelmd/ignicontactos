@@ -124,10 +124,10 @@ class DB
     
     /**
      * Guarda el contacto pasado como primer argunmento, en la base de datos.
-     * Devuelve verdadero o falso según halla sido exitosa la operación.
+     * Devuelve el id del ultimo contacto creado
      *
      * @param contacto Contacto
-     * @return bool
+     * @return Int
      */
     public function guardar_contacto(Contacto $contact){
         $keys = $this->envolver_elementos($contact->asArray(), '`', '`,');
@@ -136,7 +136,8 @@ class DB
         $sql = "insert into contactos ($keys) values ($values)";
         $stmt = $this->db->prepare($sql);
         $stmt->execute($contact->asArray());
-        return $stmt->errorInfo();
+        $last_id = $this->db->lastInsertId();
+        return $last_id;
     }
 
     /**

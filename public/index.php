@@ -84,7 +84,7 @@ function main()
             $contacto->notas = isset($c['notas']) ? $c['notas'] : null;
             $contacto->imagen = isset($c['imagen']) ? $c['imagen'] : null;
 
-            return new JsonResponse($db->guardar_contacto($contacto));
+            return new JsonResponse(array('id' => $db->guardar_contacto($contacto)));
         } catch (InvalidArgumentException $e) {
             return new JsonResponse(array('error' => $e->getMessage()), 500);
         }

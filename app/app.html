@@ -23,7 +23,7 @@
                     </div>
                 </nav>
 
-        <div ng-controller="ContactosListController" class="container section">
+        <div ng-controller="ContactosListaController as listaContactos" class="container section">
             <div class="row">
             <div class="col s4">
                 <div class="input-field">
@@ -31,37 +31,37 @@
                     <label>Buscar</label>
                 </div>
                 <ul class="collection">
-                    <li ng-repeat="contacto in contactos | filter: filtro">
-                        <a href="#" ng-click="verDetalle(contacto)" class="collection-item">
+                    <li ng-repeat="contacto in listaContactos.model.lista | filter: filtro">
+                        <a href="#" ng-click="listaContactos.verDetalle(contacto)" class="collection-item">
                             {{contacto.nombres}} {{contacto.apellidos}}
                         </a>
                     </li>
                 </ul>
             </div>
 
-            <div ng-controller="ContactoDetalleController" class="col s8">
-                <div ng-if="selectedContacto.nombres">
+            <div ng-controller="ContactoDetalleController as detalle" class="col s8">
+                <div ng-if="detalle.model.contactoSeleccionado.nombres">
                     <div class="card purple lighten-2">
                         <div ng-if="imagen" class="card-image">
                             <img ng-src="{{'data:image/png;base64,' + imagen}}"></img>
                         </div>
                         <div class="card-content white-text">
                             <span class="card-title activator grey-text text-darken-4">
-                                {{selectedContacto.nombres}} {{selectedContacto.apellidos}}
+                                {{detalle.model.contactoSeleccionado.nombres}} {{detalle.model.contactoSeleccionado.apellidos}}
                                 <i class="material-icons right">more_vert</i></span>
-                            <p>Telefono: {{selectedContacto.telefono}}</p>
-                            <p>Email: {{selectedContacto.email}}</p>
+                            <p>Telefono: {{detalle.model.contactoSeleccionado.telefono}}</p>
+                            <p>Email: {{detalle.model.contactoSeleccionado.email}}</p>
                         </div>
                         <div class="card-reveal">
                             <span class="card-title grey-text text-darken-4">
-                                {{selectedContacto.nombres}} {{selectedContacto.apellidos}}
+                                {{detalle.model.contactoSeleccionado.nombres}} {{detalle.model.contactoSeleccionado.apellidos}}
                                 <i class="material-icons right">close</i></span>
-                            <p>Cumpleaños: {{selectedContacto.fecha_nacimiento}}</p>
-                            <p>Direccion: {{selectedContacto.pais}} {{selectedContacto.departamento}} {{selectedContacto.ciudad}}
-                                {{selectedContacto.direccion}}
+                            <p>Cumpleaños: {{detalle.model.contactoSeleccionado.fecha_nacimiento}}</p>
+                            <p>Direccion: {{detalle.model.contactoSeleccionado.pais}} {{detalle.model.contactoSeleccionado.departamento}} {{detalle.model.contactoSeleccionado.ciudad}}
+                                {{detalle.model.contactoSeleccionado.direccion}}
                             </p>
-                            <p>Categoria: {{selectedContacto.categoria}}</p>
-                            <p>Notas: {{selectedContacto.notas}}</p>
+                            <p>Categoria: {{detalle.model.contactoSeleccionado.categoria}}</p>
+                            <p>Notas: {{detalle.model.contactoSeleccionado.notas}}</p>
                             <div ng-if="selectedContacto.direccion">
                                 <div map-lazy-load="https://maps.googleapis.com/maps/api/js?key=AIzaSyCenvVgbTO5zfRsh-8MGKS04rTMOPZur_w">
                                     <ng-map center="{{selectedContacto.direccion}}" style="height:300px">
@@ -71,8 +71,8 @@
                             </div>
                         </div>
                         <div class="card-action">
-                            <a ng-click="borrarContacto()" href="#"><i class="material-icons white-text">delete</i></a>
-                            <a ng-click="editarContacto()" href="#"><i class="material-icons white-text">mode_edit</i></a>
+                            <a ng-click="detalle.borrarContacto(detalle.model.contactoSeleccionado.id)" href="#"><i class="material-icons white-text">delete</i></a>
+                            <a ng-click="detalle.editarContacto()" href="#"><i class="material-icons white-text">mode_edit</i></a>
                         </div>
                     </div>
                 </div>
@@ -82,63 +82,63 @@
 
         <div class="modal" id="contacto-form">
             <div class="modal-content">
-                <form ng-controller="ContactoCrearController" class="col s12">
+                <form ng-controller="ContactoCrearController as formulario" class="col s12">
                     <div class="row">
                         <div class="input-field col s4">
-                            <input ng-model="contacto.nombres" type="text" placeholder="Nombres" class="validate">
-                            <label for="contacto.nombres">Nombres:</label>
+                            <input ng-model="formulario.contacto.nombres" type="text" placeholder="Nombres" class="validate">
+                            <label for="formulario.contacto.nombres">Nombres:</label>
                         </div>
                         <div class="input-field col s4">
-                            <input ng-model="contacto.apellidos" type="text" placeholder="Apellidos" class="validate">
-                            <label for="contacto.apellidos">Apellidos:</label>
+                            <input ng-model="formulario.contacto.apellidos" type="text" placeholder="Apellidos" class="validate">
+                            <label for="formulario.contacto.apellidos">Apellidos:</label>
                         </div>
                         <div class="input-field col s4">
-                            <input ng-model="contacto.telefono" type="text" placeholder="Telefono" class="validate">
-                            <label for="contacto.telefono">Telefono:</label>
+                            <input ng-model="formulario.contacto.telefono" type="text" placeholder="Telefono" class="validate">
+                            <label for="formulario.contacto.telefono">Telefono:</label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="input-field col s4">
-                            <input ng-model="contacto.email" type="text" placeholder="email"> 
+                            <input ng-model="formulario.contacto.email" type="text" placeholder="email"> 
                             <label for="">Email:</label>
                         </div>
                         <div class="input-field col s4">
-                            <input ng-model="contacto.categoria" type="text" placeholder="categoria"> 
+                            <input ng-model="formulario.contacto.categoria" type="text" placeholder="categoria"> 
                             <label for="">Categoria:</label>
                         </div>
                         <div class="input-field col s4">
-                            <input ng-model="contacto.fecha_nacimiento" type="text" placeholder="fecha_nacimiento"> 
+                            <input ng-model="formulario.contacto.fecha_nacimiento" type="text" placeholder="fecha_nacimiento"> 
                             <label for="">Fecha de Cumpleaños:</label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="input-field col s4">
-                            <input ng-model="contacto.pais" type="text" placeholder="pais"> 
+                            <input ng-model="formulario.contacto.pais" type="text" placeholder="pais"> 
                             <label for="">Pais:</label>
                         </div>
                         <div class="input-field col s4">
-                            <input ng-model="contacto.departamento" type="text" placeholder="departamento"> 
+                            <input ng-model="formulario.contacto.departamento" type="text" placeholder="departamento"> 
                             <label for="">Departamento:</label>
                         </div>
                         <div class="input-field col s4">
-                            <input ng-model="contacto.ciudad" type="text" placeholder="ciudad"> 
+                            <input ng-model="formulario.contacto.ciudad" type="text" placeholder="ciudad"> 
                             <label for="">Ciudad:</label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="input-field col s6">
-                            <input ng-model="contacto.direccion" type="text" placeholder="direccion"> 
+                            <input ng-model="formulario.contacto.direccion" type="text" placeholder="direccion"> 
                             <label for="">Direccion:</label>
                         </div>
                         <div class="input-field col s6">
-                            <input ng-model="contacto.coordenadas" type="text" placeholder="coordenadas"> 
+                            <input ng-model="formulario.contacto.coordenadas" type="text" placeholder="coordenadas"> 
                             <label for="">Coordenadas:</label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="input-field col s12">
-                            <textarea ng-model="contacto.notas" type="text" placeholder="Notas" class="materialize-textarea"></textarea>
-                            <label for="contacto.notas">Notas:</label>
+                            <textarea ng-model="formulario.contacto.notas" type="text" placeholder="Notas" class="materialize-textarea"></textarea>
+                            <label for="formulario.contacto.notas">Notas:</label>
                         </div>
                     </div>
 
@@ -147,8 +147,8 @@
                         Imagen de Contacto
                     </div>
 
-                    <a ng-click="crearContacto()" class="waves-effect waves-light btn"><i class="material-icons right">done</i>Crear</a>
-                    <a ng-click="guardarCambios()" class="waves-effect waves-light btn"><i class="material-icons right">done</i>Guardar Cambios</a>
+                    <a ng-if="!formulario.editar" ng-click="formulario.crearContacto(formulario.contacto)" class="waves-effect waves-light btn"><i class="material-icons right">done</i>Crear</a>
+                    <a ng-if="formulario.editar" ng-click="formulario.guardarCambios(formulario.contacto)" class="waves-effect waves-light btn"><i class="material-icons right">done</i>Guardar Cambios</a>
                 </form>
             </div>
         </div>

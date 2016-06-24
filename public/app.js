@@ -2,67 +2,58 @@
     'use strict';
 
     angular.module('ignicontactos', ['ngCookies', 'ngMap', 'ngFileUpload'])
+    /*
+     * Servicio para manejar contactos, este es el encargado de realizar
+     * las peticiones al servidor mediante protocolo http usando un patrón REST
+     */
+        .service('contactos', function Contactos($http, $cookies){
+            var contactos = this;
 
-        .controller('ContactosListController', function ContactosListController($http, $scope, $cookies){
-            $scope.contactos = [];
-            $scope.selectedContacto = {};
-            $scope.imagen = '';
-            $http.get('/' + $cookies.get('username') + '/contacto/todos').then(function(response){
-                $scope.contactos = response.data;
-            });
-            $scope.verDetalle = function(data){
-                $scope.selectedContacto = data;
-                $http.get('/imagen', {params: {'name': data.imagen}}).then(function(response){
-                    $scope.imagen = response.data.imagen;
-                });
-            };
-            $scope.$on('contactoCreado', function(event, data){
-                $scope.contactos.push(data);
-                $('#contacto-form').closeModal();
-                Materialize.toast('Contacto creado exitosamente', 5000);
-            });
-            $scope.$on('contactoBorrado', function(event, data){
-                Materialize.toast('Contacto borrado exitosamente', 5000);
-                $scope.selectedContacto = {};
-                $scope.contactos = $scope.contactos.filter(function(elem){
-                    return elem.id !== data;
-                });
-            });
-        })
-        .controller('ContactoDetalleController', function ContactoDetalleController($http, $scope, $cookies, $rootScope){
-            $scope.borrarContacto = function(){
-                $http({method: 'DELETE', url: '/' + $cookies.get('username') + '/contacto/' + $scope.selectedContacto.id})
-                    .then(function(data){
-                        $rootScope.$broadcast('contactoBorrado', $scope.selectedContacto.id);
-                    });
-            };
-            $scope.editarContacto = function(){
-                $rootScope.$broadcast('editarContacto', $scope.selectedContacto);
-            };
-        })
-        .controller('ContactoCrearController', function ContactoCrearController($http, $scope, $rootScope, $cookies, Upload){
-            $scope.contacto = {};
-            $scope.crearContacto = function(){
-                $http.post('/' + $cookies.get('username') + '/contacto/nuevo', $scope.contacto)
+            contactos.model = {contactoSeleccionado: {}, lista: []};
+
+            contactos.obtenerContactos = function obtenerContactos() {
+                $http.get('/' + $cookies.get('username') + '/contacto/todos')
                     .then(function(response){
-                        console.log(response.data);
-                        $rootScope.$broadcast('contactoCreado', $scope.contacto);
-                        $scope.contacto = {};
+                        contactos.model.lista = response.data;
+                    }, function(reason){
+                        console.log(reason.data);
                     });
             };
-            $scope.guardarCambios = function(){
-                $http({method: 'PUT', url: '/' + $cookies.get('username') + '/contacto/' + $scope.contacto.id, data: $scope.contacto})
+
+            contactos.crearContacto = function crearContacto(data) {
+                $http.post('/' + $cookies.get('username') + '/contacto/nuevo', data)
+                    .then(function(response){
+                        data.id = response.data.id;
+                        contactos.model.lista.push(data);
+                    });
+            };
+
+            contactos.actualizarContacto = function(data){
+                $http.put('/' + $cookies.get('username') + '/contacto/' + data.id, data)
                     .then(function(response){
                         $('#contacto-form').closeModal();
-                        $scope.contacto = {};
                     });
             };
-            $scope.$on('editarContacto', function(event, data) {
-                $('#contacto-form').openModal();
-                $scope.contacto = data;
-                console.log(data);
-            });
-            $scope.upload = function (file) {
+
+            /*
+             * Envia un peticion con metodo DELETE al servidor y actualiza la
+             * vista si la petición es exitosa.
+             */
+            contactos.borrarContacto = function borrarContacto(id) {
+                $http.delete('/' + $cookies.get('username') + '/contacto/' + id)
+                    .then(function(){
+                        contactos.model.lista = contactos.model.lista.filter(function(element){
+                            return element.id !== id;
+                        });
+                        contactos.model.contactoSeleccionado = {};
+                    });
+            };
+
+            contactos.seleccionarContacto = function seleccionarContacto(data) {
+                contactos.model.contactoSeleccionado = data;
+            };
+
+            contactos.upload = function (file) {
                 Upload.upload({
                     url: '/' + $cookies.get('username') + '/images',
                     data: {file: file, 'username': $scope.username}
@@ -74,6 +65,50 @@
                     var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
                     console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
                 });
+            };
+        })
+
+    /*
+     * Controlador que muestra la lista de contactos obtenidos del servidor,
+     * esto se actualiza automáticamente usando el método descrito en
+     * http://stackoverflow.com/questions/19744462/update-scope-value-when-service-data-is-changed
+     * a la vez que tiene mejor eficiencia.
+     */
+        .controller('ContactosListaController', function ContactosListaController(contactos){
+            var listaContactos = this;
+
+            listaContactos.model = contactos.model;
+
+            contactos.obtenerContactos();
+
+            listaContactos.verDetalle = function(data){
+                contactos.seleccionarContacto(data);
+            };
+        })
+
+
+        .controller('ContactoDetalleController', function ContactoDetalleController(contactos){
+            var detalle = this;
+
+            detalle.model = contactos.model;
+
+            detalle.borrarContacto = function borrarContacto(id) {
+                contactos.borrarContacto(id);
+            };
+
+        })
+
+
+        .controller('ContactoCrearController', function ContactoCrearController(contactos){
+            var formulario = this;
+
+            formulario.editar = false;
+            formulario.model = contactos.model;
+            formulario.contacto = {};
+
+            formulario.crearContacto = function crearContacto(contacto) {
+                contactos.crearContacto(contacto);
+                formulario.contacto = {};
             };
         });
 })();
