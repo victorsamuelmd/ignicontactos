@@ -7,12 +7,13 @@
      * las peticiones al servidor mediante protocolo http usando un patrón REST
      */
         .service('contactos', function Contactos($http, $cookies){
-            var contactos = this;
+            var contactos = this,
+                username = $cookies.get('username');
 
             contactos.model = {contactoSeleccionado: {}, lista: []};
 
             contactos.obtenerContactos = function obtenerContactos() {
-                $http.get('/' + $cookies.get('username') + '/contacto/todos')
+                $http.get('/' + username + '/contacto/todos')
                     .then(function(response){
                         contactos.model.lista = response.data;
                     }, function(reason){
@@ -21,7 +22,7 @@
             };
 
             contactos.crearContacto = function crearContacto(data) {
-                $http.post('/' + $cookies.get('username') + '/contacto/nuevo', data)
+                $http.post('/' + username + '/contacto/nuevo', data)
                     .then(function(response){
                         data.id = response.data.id;
                         contactos.model.lista.push(data);
@@ -29,7 +30,7 @@
             };
 
             contactos.actualizarContacto = function(data){
-                $http.put('/' + $cookies.get('username') + '/contacto/' + data.id, data)
+                $http.put('/' + username + '/contacto/' + data.id, data)
                     .then(function(response){
                         $('#contacto-form').closeModal();
                     });
@@ -40,7 +41,7 @@
              * vista si la petición es exitosa.
              */
             contactos.borrarContacto = function borrarContacto(id) {
-                $http.delete('/' + $cookies.get('username') + '/contacto/' + id)
+                $http.delete('/' + username + '/contacto/' + id)
                     .then(function(){
                         contactos.model.lista = contactos.model.lista.filter(function(element){
                             return element.id !== id;
@@ -53,10 +54,11 @@
                 contactos.model.contactoSeleccionado = data;
             };
 
+            // TODO: Esta funcion no esta bien estructurada
             contactos.upload = function (file) {
                 Upload.upload({
-                    url: '/' + $cookies.get('username') + '/images',
-                    data: {file: file, 'username': $scope.username}
+                    url: '/' + username + '/images',
+                    data: {file: file, 'username': username}
                 }).then(function (resp) {
                     $scope.contacto.imagen = resp.data.img;
                 }, function (resp) {
@@ -79,11 +81,11 @@
 
             listaContactos.model = contactos.model;
 
-            contactos.obtenerContactos();
-
             listaContactos.verDetalle = function(data){
                 contactos.seleccionarContacto(data);
             };
+
+            contactos.obtenerContactos();
         })
 
 
