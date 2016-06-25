@@ -83,8 +83,11 @@ function main()
             $contacto->coordenadas = isset($c['coordenadas']) ? $c['coordenadas'] : null;
             $contacto->notas = isset($c['notas']) ? $c['notas'] : null;
             $contacto->imagen = isset($c['imagen']) ? $c['imagen'] : null;
-
-            return new JsonResponse(array('id' => $db->guardar_contacto($contacto)));
+            $id = $db->guardar_contacto($contacto);
+            if ($id) {
+                return new JsonResponse(array('id' => $id));
+            }
+            return new JsonResponse(array('error' => 'Contacto no creado'));
         } catch (InvalidArgumentException $e) {
             return new JsonResponse(array('error' => $e->getMessage()), 500);
         }

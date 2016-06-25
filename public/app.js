@@ -32,7 +32,7 @@
             contactos.actualizarContacto = function(data){
                 $http.put('/' + username + '/contacto/' + data.id, data)
                     .then(function(response){
-                        $('#contacto-form').closeModal();
+                        // TODO
                     });
             };
 
@@ -80,6 +80,7 @@
             var listaContactos = this;
 
             listaContactos.model = contactos.model;
+            listaContactos.crear = false;
 
             listaContactos.verDetalle = function(data){
                 contactos.seleccionarContacto(data);
@@ -93,28 +94,25 @@
             var detalle = this;
 
             detalle.model = contactos.model;
+            detalle.editar = true;
 
             detalle.borrarContacto = function borrarContacto(id) {
                 contactos.borrarContacto(id);
+            };
+            detalle.editarContacto = function editarContacto() {
+               detalle.editar = false; 
             };
 
         })
 
 
-        .controller('ContactoCrearController', function ContactoCrearController(contactos){
-            var formulario = this;
-
-            formulario.editar = false;
-            formulario.model = contactos.model;
-            formulario.contacto = {};
-
-            formulario.crearContacto = function crearContacto(contacto) {
-                contactos.crearContacto(contacto);
-                formulario.contacto = {};
-            };
+        .component('formularioContacto', {
+            templateUrl: 'templates/contacto.formulario.html',
+            controller: function (){
+                var formulario = this;
+            },
+            bindings: {
+                contacto: '='
+            }
         });
 })();
-$(document).ready(function(){
-    // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
-    $('.modal-trigger').leanModal();
-});

@@ -1,0 +1,72 @@
+<div class="" id="contacto-form">
+    <div class="">
+        <form class="col s12">
+            <div class="row">
+                <div class="input-field col s4">
+                    <input ng-model="$ctrl.contacto.nombres" type="text" placeholder="Nombres" class="validate">
+                    <label for="formulario.contacto.nombres">Nombres:</label>
+                </div>
+                <div class="input-field col s4">
+                    <input ng-model="formulario.contacto.apellidos" type="text" placeholder="Apellidos" class="validate">
+                    <label for="formulario.contacto.apellidos">Apellidos:</label>
+                </div>
+                <div class="input-field col s4">
+                    <input ng-model="formulario.contacto.telefono" type="text" placeholder="Telefono" class="validate">
+                    <label for="formulario.contacto.telefono">Telefono:</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s4">
+                    <input ng-model="formulario.contacto.email" type="text" placeholder="email"> 
+                    <label for="">Email:</label>
+                </div>
+                <div class="input-field col s4">
+                    <input ng-model="formulario.contacto.categoria" type="text" placeholder="categoria"> 
+                    <label for="">Categoria:</label>
+                </div>
+                <div class="input-field col s4">
+                    <input ng-model="formulario.contacto.fecha_nacimiento" type="text" placeholder="fecha_nacimiento"> 
+                    <label for="">Fecha de Cumpleaños:</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s4">
+                    <input ng-model="formulario.contacto.pais" type="text" placeholder="pais"> 
+                    <label for="">Pais:</label>
+                </div>
+                <div class="input-field col s4">
+                    <input ng-model="formulario.contacto.departamento" type="text" placeholder="departamento"> 
+                    <label for="">Departamento:</label>
+                </div>
+                <div class="input-field col s4">
+                    <input ng-model="formulario.contacto.ciudad" type="text" placeholder="ciudad"> 
+                    <label for="">Ciudad:</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s6">
+                    <input ng-model="formulario.contacto.direccion" type="text" placeholder="direccion"> 
+                    <label for="">Direccion:</label>
+                </div>
+                <div class="input-field col s6">
+                    <input ng-model="formulario.contacto.coordenadas" type="text" placeholder="coordenadas"> 
+                    <label for="">Coordenadas:</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <textarea ng-model="formulario.contacto.notas" type="text" placeholder="Notas" class="materialize-textarea"></textarea>
+                    <label for="formulario.contacto.notas">Notas:</label>
+                </div>
+            </div>
+
+            <div class="btn-flat" ngf-select="upload($file)" ng-model="file" name="file"
+                                                                             ngf-accept="'image/*'" ngf-max-size="20MB" ngf-min-height="100">
+                Imagen de Contacto
+            </div>
+
+            <a ng-if="!formulario.editar" ng-click="formulario.crearContacto(formulario.contacto)" class="waves-effect waves-light btn"><i class="material-icons right">done</i>Crear</a>
+            <a ng-if="formulario.editar" ng-click="formulario.guardarCambios(formulario.contacto)" class="waves-effect waves-light btn"><i class="material-icons right">done</i>Guardar Cambios</a>
+        </form>
+    </div>
+</div>

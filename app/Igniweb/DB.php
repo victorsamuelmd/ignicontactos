@@ -135,9 +135,11 @@ class DB
 
         $sql = "insert into contactos ($keys) values ($values)";
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($contact->asArray());
-        $last_id = $this->db->lastInsertId();
-        return $last_id;
+        if ($stmt->execute($contact->asArray())) {
+            $last_id = $this->db->lastInsertId();
+            return $last_id;
+        }
+        return null;
     }
 
     /**
