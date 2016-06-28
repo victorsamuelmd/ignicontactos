@@ -3,7 +3,7 @@
         <form class="col s12">
             <div class="row">
                 <div class="input-field col s4">
-                    <input ng-model="$ctrl.contacto.nombres" type="text" placeholder="Nombres" class="validate">
+                    <input ng-model="formulario.contacto.nombres" type="text" placeholder="Nombres" class="validate">
                     <label for="formulario.contacto.nombres">Nombres:</label>
                 </div>
                 <div class="input-field col s4">
@@ -65,7 +65,7 @@
                 Imagen de Contacto
             </div>
 
-            <a ng-if="!formulario.editar" ng-click="formulario.crearContacto(formulario.contacto)" class="waves-effect waves-light btn"><i class="material-icons right">done</i>Crear</a>
+            <a ng-if="!formulario.editar" ng-click="formulario.crear(contacto)" class="waves-effect waves-light btn"><i class="material-icons right">done</i>Crear</a>
             <a ng-if="formulario.editar" ng-click="formulario.guardarCambios(formulario.contacto)" class="waves-effect waves-light btn"><i class="material-icons right">done</i>Guardar Cambios</a>
         </form>
     </div>

@@ -1,0 +1,20 @@
+<table>
+    <thead>
+        <tr>
+            <th>Nombres</th>
+            <th>Apellidos</th>
+            <th>Telefono</th>
+            <th>Email</th>
+            <th>Categoria</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="contacto in tabla.contactos">
+            <td>{{contacto.nombres}}</td>
+            <td>{{contacto.apellidos}}</td>
+            <td>{{contacto.telefono}}</td>
+            <td>{{contacto.email}}</td>
+            <td>{{contacto.categoria}}</td>
+        </tr>
+    </tbody>
+</table>

@@ -1,0 +1,41 @@
+<div ng-if="cnt.contacto.nombres">
+    <div class="card purple lighten-2">
+        <div ng-if="imagen" class="card-image">
+            <img ng-src="{{'data:image/png;base64,' + imagen}}"></img>
+        </div>
+        <div class="card-content white-text">
+            <span class="card-title activator grey-text text-darken-4">
+                {{cnt.contacto.nombres}} {{contacto.apellidos}}
+                <i class="material-icons right">more_vert</i></span>
+            <p>Telefono: {{contacto.telefono}}</p>
+            <p>Email: {{contacto.email}}</p>
+        </div>
+        <div class="card-reveal">
+            <span class="card-title grey-text text-darken-4">
+                {{contacto.nombres}} {{contacto.apellidos}}
+                <i class="material-icons right">close</i>
+            </span>
+            <p>Cumpleaños: {{contacto.fecha_nacimiento}}</p>
+            <p>Direccion: {{contacto.pais}} {{contacto.departamento}} {{contacto.ciudad}}
+            {{contacto.direccion}}
+            </p>
+            <p>Categoria: {{contacto.categoria}}</p>
+            <p>Notas: {{contacto.notas}}</p>
+            <div ng-if="contacto.direccion">
+                <div map-lazy-load="https://maps.googleapis.com/maps/api/js?key=AIzaSyCenvVgbTO5zfRsh-8MGKS04rTMOPZur_w">
+                    <ng-map center="{{contacto.direccion}}" style="height:300px">
+                        <marker position="{{contacto.coordenadas}}"><marker>
+                    </ng-map>
+                </div>
+            </div>
+        </div>
+        <div class="card-action">
+            <a ng-click="cnt.cntBorrar()" href="#card">
+                <i class="material-icons white-text">delete</i>
+            </a>
+            <a ng-click="cnt.cntEditar()" href="#card">
+                <i class="modal-trigger material-icons white-text">mode_edit</i>
+            </a>
+        </div>
+    </div>
+</div>

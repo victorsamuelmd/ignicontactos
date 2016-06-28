@@ -10,12 +10,10 @@
             var contactos = this,
                 username = $cookies.get('username');
 
-            contactos.model = {contactoSeleccionado: {}, lista: []};
-
             contactos.obtenerContactos = function obtenerContactos() {
-                $http.get('/' + username + '/contacto/todos')
+                return $http.get('/' + username + '/contacto/todos')
                     .then(function(response){
-                        contactos.model.lista = response.data;
+                        return response.data;
                     }, function(reason){
                         console.log(reason.data);
                     });
@@ -26,6 +24,7 @@
                     .then(function(response){
                         data.id = response.data.id;
                         contactos.model.lista.push(data);
+                        contactos.model.nuevo = {};
                     });
             };
 
@@ -69,50 +68,100 @@
                 });
             };
         })
+        .component('appRoot', {
+            templateUrl: 'templates/app.component.html',
+            controllerAs: 'app',
+            controller: function(contactos) {
+                var app = this;
 
-    /*
-     * Controlador que muestra la lista de contactos obtenidos del servidor,
-     * esto se actualiza automáticamente usando el método descrito en
-     * http://stackoverflow.com/questions/19744462/update-scope-value-when-service-data-is-changed
-     * a la vez que tiene mejor eficiencia.
-     */
-        .controller('ContactosListaController', function ContactosListaController(contactos){
-            var listaContactos = this;
+                app.$onInit = function() {
+                    console.log('Inicializado el componente de la aplicación');
+                }
+            }
+        })
 
-            listaContactos.model = contactos.model;
-            listaContactos.crear = false;
+        .component('contactoLista', {
+            templateUrl: 'templates/contacto-lista.component.html',
+            controllerAs: 'lista',
+            controller: function ContactosListaController(contactos){
+                var listaContactos = this;
 
-            listaContactos.verDetalle = function(data){
-                contactos.seleccionarContacto(data);
-            };
+                listaContactos.lista = [];
+                listaContactos.filtro = '';
+                listaContactos.contactoSeleccionado = {};
 
-            contactos.obtenerContactos();
+                listaContactos.verDetalle = function(data){
+                    listaContactos.contactoSeleccionado = data;
+                };
+
+                listaContactos.crearContacto = function(contacto) {
+                    contactos.crearContacto(contacto);
+                }
+
+                listaContactos.$onInit = function() {
+                    console.log("Inicializado el componente de lista de Contactos");
+                    contactos.obtenerContactos().then(function(data) {
+                        listaContactos.lista = data;
+                    });
+                }
+
+            }
         })
 
 
-        .controller('ContactoDetalleController', function ContactoDetalleController(contactos){
-            var detalle = this;
+        .component('contactoDetalle', {
+            controllerAs: 'cnt',
+            templateUrl: 'templates/contacto-detalle.component.html',
+            controller: function ContactoDetalleController(contactos){
+                var detalle = this;
 
-            detalle.model = contactos.model;
-            detalle.editar = true;
+                detalle.editar = true;
+                detalle.contacto = {};
 
-            detalle.borrarContacto = function borrarContacto(id) {
-                contactos.borrarContacto(id);
-            };
-            detalle.editarContacto = function editarContacto() {
-               detalle.editar = false; 
-            };
+                detalle.borrarContacto = function borrarContacto(id) {
+                    contactos.borrarContacto(id);
+                };
+                detalle.editarContacto = function editarContacto() {
+                    detalle.editar = false; 
+                };
 
-        })
-
-
-        .component('formularioContacto', {
-            templateUrl: 'templates/contacto.formulario.html',
-            controller: function (){
-                var formulario = this;
+                detalle.$onChanges = function (changesObj) {
+                    detalle.contacto = changesObj.contacto.currentValue;
+                }
             },
             bindings: {
-                contacto: '='
+                contacto: '<',
+                cntEditar: '&',
+                cntBorrar: '&'
+            }
+        })
+
+
+        .component('contactoFormulario', {
+            templateUrl: 'templates/contacto.formulario.html',
+            controllerAs: 'formulario',
+            controller: function (){
+                var formulario = this;
+                formulario.crear = function(contacto) {
+                    formulario.onCreate(contacto);
+                    console.log("Funcion llamada con: ", contacto);
+                }
+            },
+            bindings: {
+                contacto: '<',
+                onCreate: '&',
+                onUpdate: '&'
+            }
+        })
+
+        .component('contactoTabla', {
+            templateUrl: 'templates/contactos-tabla.component.html',
+            controllerAs: 'tabla',
+            controller: function() {
+                
+            },
+            bindings: {
+                contactos: '<'
             }
         });
 })();

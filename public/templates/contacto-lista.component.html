@@ -1,0 +1,19 @@
+<div class="row">
+    <div class="col s4">
+    <div class="input-field">
+        <input type="text" ng-model="lista.filtro" class="">
+        <label>Buscar</label>
+    </div>
+    <ul class="collection">
+        <li ng-repeat="contacto in lista.lista | filter: lista.filtro">
+            <a href="#" ng-click="lista.verDetalle(contacto)" class="collection-item">
+                {{contacto.nombres}} {{contacto.apellidos}}
+            </a>
+        </li>
+    </ul>
+    </div>
+
+    <div class="col s8">
+    <contacto-detalle contacto="lista.contactoSeleccionado"></contacto-detalle>
+    </div>
+</div>
