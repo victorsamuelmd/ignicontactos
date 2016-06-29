@@ -85,12 +85,15 @@
                 app.seleccionarContacto = function(contacto) {
                     app.imagen = null;
                     app.contactoSeleccionado = contacto;
+                    if (contacto.imagen) {
                     contactos.obtenerImagen(contacto.imagen).then(
                             function(data) {
                                 app.imagen = data.imagen;
                             }, function(error) {
                                 console.log(error);
+                                app.imagen = null;
                             });
+                    }
                 };
 
                 app.borrarContacto = function borrarContacto(id) {
@@ -101,7 +104,7 @@
 
                 app.iniciarEdicion = function(contacto) {
                     $('#contacto-form').openModal();
-                    app.contactoEnEdicion = contacto;
+                    app.contactoEnEdicion = angular.copy(contacto);
                     app.enEdicion = true;
                 };
 
@@ -119,8 +122,12 @@
 
                 app.editarContacto = function(contacto) {
                     $('#contacto-form').closeModal();
-                    contactos.actualizarContacto(contacto);
-                    app.$onInit();
+                    if (angular.equals(app.contactoSeleccionado, app.contactoEnEdicion)) {
+                        console.log("Son iguales");
+                    } else {
+                        contactos.actualizarContacto(contacto);
+                        app.$onInit();
+                    }
                 };
 
                 app.subirImagen = function(file) {
