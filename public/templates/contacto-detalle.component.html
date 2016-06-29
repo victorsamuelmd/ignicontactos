@@ -1,0 +1,38 @@
+<md-card>
+    <img ng-src="http://placehold.it/150x150"/>
+    <md-card-title>
+        <md-card-title-text>
+            <span class="md-title">
+                {{$ctrl.contacto.nombres}} {{$ctrl.contacto.apellidos}}
+            </span>
+        </md-card-title-text>
+    </md-card-title>
+
+    <md-card-content>
+
+        <p>Telefono: {{ $ctrl.contacto.telefono }}</p>
+        <p>Email: {{$ctrl.contacto.email}}</p>
+
+        <p>Cumpleaños: {{$ctrl.contacto.fecha_nacimiento}}</p>
+        <p>Direccion: {{$ctrl.contacto.pais}} {{$ctrl.contacto.departamento}} {{$ctrl.contacto.ciudad}}
+            {{$ctrl.contacto.direccion}}
+        </p>
+        <p>Categoria: {{$ctrl.contacto.categoria}}</p>
+        <p>Notas: {{$ctrl.contacto.notas}}</p>
+
+        <div ng-if="$ctrl.contacto.direccion">
+            <div map-lazy-load="https://maps.googleapis.com/maps/api/js?key=AIzaSyCenvVgbTO5zfRsh-8MGKS04rTMOPZur_w">
+                <ng-map center="{{$ctrl.contacto.direccion}}" style="height:300px">
+                    <marker position="{{$ctrl.contacto.direccion}}"></marker>
+                </ng-map>
+            </div>
+        </div>
+    </md-card-content>
+
+    <md-card-actions layout="row">
+
+        <md-button class="md-primary" ng-click="$ctrl.onUpdate($ctrl.contacto)">Editar</md-button>
+        <md-button class="md-primary" ng-click="$ctrl.onDelete($ctrl.contacto)">Borrar</md-button>
+    </md-card-actions>
+</md-card>
+

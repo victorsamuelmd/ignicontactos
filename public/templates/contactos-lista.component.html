@@ -1,0 +1,32 @@
+<div layout="row">
+
+    <div layout="column" flex="40">
+        <md-input-container>
+            <label>Filtro</label>
+            <input ng-model="lista.filtro">
+        </md-input-container>
+        <md-list>
+            <md-list-item ng-click="lista.verDetalle(contacto)" ng-repeat="contacto in lista.model.lista | filter:lista.filtro">
+                <div class="md-list-item-text">
+                    {{contacto.nombres}} {{contacto.apellidos}}
+                </div>
+                <md-checkbox class="md-secondary"></md-checkbox>
+            </md-list-item>
+        </md-list>
+    </div>
+
+    <contacto-detalle flex="60" 
+                      contacto="lista.seleccionado"
+                      ng-if="lista.seleccionado" 
+                      on-update="lista.editarContacto(lista.seleccionado)" 
+                      on-delete="lista.borrarContacto(lista.seleccionado)">
+    </contacto-detalle>
+
+    <md-button class="md-fab md-primary" 
+        aria-label="Use Android"
+        ng-click="lista.editarContacto($event)"
+        style="right: 2em; bottom: 2em; position: fixed;">
+        +
+    </md-button>
+
+</div>

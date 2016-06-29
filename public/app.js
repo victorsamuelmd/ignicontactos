@@ -1,7 +1,7 @@
 (function(){
     'use strict';
 
-    angular.module('ignicontactos', ['ngCookies', 'ngMap', 'ngFileUpload'])
+    angular.module('ignicontactos', ['ngMaterial', 'ngMessages', 'ngCookies', 'ngMap', 'ngFileUpload'])
     /*
      * Servicio para manejar contactos, este es el encargado de realizar
      * las peticiones al servidor mediante protocolo http usando un patrón REST
@@ -69,6 +69,15 @@
                 });
             };
         })
+        .controller('AppController', function AppController() {
+            var app = this;
+            app.borrarContacto = function(contacto) {
+                console.log(contacto); 
+            };
+            app.editarContacto = function(contacto) {
+                console.log(contacto); 
+            };
+        })
 
     /*
      * Controlador que muestra la lista de contactos obtenidos del servidor,
@@ -76,43 +85,113 @@
      * http://stackoverflow.com/questions/19744462/update-scope-value-when-service-data-is-changed
      * a la vez que tiene mejor eficiencia.
      */
-        .controller('ContactosListaController', function ContactosListaController(contactos){
-            var listaContactos = this;
-
-            listaContactos.model = contactos.model;
-            listaContactos.crear = false;
-
-            listaContactos.verDetalle = function(data){
-                contactos.seleccionarContacto(data);
-            };
-
-            contactos.obtenerContactos();
+        .component('contactosLista', {
+            templateUrl: 'templates/contactos-lista.component.html',
+            controller: ContactosListaController,
+            controllerAs: 'lista'
+        })
+        .component('contactoDetalle', {
+            templateUrl: 'templates/contacto-detalle.component.html',
+            controller: ContactoDetalleController,
+            bindings: {
+                contacto: '<',
+                imagen: '=',
+                onDelete: '&',
+                onUpdate: '&'
+            }
         })
 
-
-        .controller('ContactoDetalleController', function ContactoDetalleController(contactos){
-            var detalle = this;
-
-            detalle.model = contactos.model;
-            detalle.editar = true;
-
-            detalle.borrarContacto = function borrarContacto(id) {
-                contactos.borrarContacto(id);
-            };
-            detalle.editarContacto = function editarContacto() {
-               detalle.editar = false; 
-            };
-
-        })
-
-
-        .component('formularioContacto', {
+        .component('contactoFormulario', {
             templateUrl: 'templates/contacto.formulario.html',
             controller: function (){
                 var formulario = this;
             },
+            controllerAs: 'formulario',
             bindings: {
-                contacto: '='
+                contacto: '=',
             }
         });
+
+    function ContactosListaController(contactos, $mdDialog, $mdMedia, $scope){
+        var listaContactos = this;
+
+        listaContactos.model = contactos.model;
+        listaContactos.crear = false;
+        listaContactos.seleccionado = null;
+
+        listaContactos.verDetalle = function(data){
+            listaContactos.seleccionado = data;
+            console.log(data);
+        };
+
+        listaContactos.borrarContacto = function(contacto) {
+            contactos.borrarContacto(contacto.id);
+        };
+
+        contactos.obtenerContactos();
+
+        $scope.status = '  ';
+        $scope.customFullscreen = $mdMedia('xs') || $mdMedia('sm');
+        listaContactos.showAlert = function(ev) {
+            // Appending dialog to document.body to cover sidenav in docs app
+            // Modal dialogs should fully cover application
+            // to prevent interaction outside of dialog
+            $mdDialog.show(
+                $mdDialog.alert()
+                .parent(angular.element(document.querySelector('#popupContainer')))
+                .clickOutsideToClose(true)
+                .title('This is an alert title')
+                .textContent('You can specify some description text in here.')
+                .ariaLabel('Alert Dialog Demo')
+                .ok('Got it!')
+                .targetEvent(ev)
+            );
+        };
+
+        listaContactos.editarContacto = function(ev, contacto) {
+            var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && $scope.customFullscreen;
+            $mdDialog.show({
+                controller: DialogController,
+                controllerAs: 'formulario',
+                templateUrl: 'templates/contacto-formulario.component.html',
+                parent: angular.element(document.body),
+                targetEvent: ev,
+                clickOutsideToClose: true,
+                fullscreen: true
+            })
+            .then(function(answer) {
+                console.log("Dio una respuesta");
+            }, function() {
+                console.log("No dio respuesta");
+            });
+
+        $scope.$watch(function() {
+            return $mdMedia('xs') || $mdMedia('sm');
+        }, function(wantsFullScreen) {
+            $scope.customFullscreen = (wantsFullScreen === true);
+        });
+        };
+    }
+
+    function ContactoDetalleController(){
+        var contacto = this;
+    }
+
+    function DialogController($scope, $mdDialog, contactos) {
+        var dialog = this;
+        $scope.hide = function() {
+            $mdDialog.hide();
+        };
+        dialog.cancel = function() {
+            $mdDialog.cancel();
+        };
+        $scope.answer = function(answer) {
+            $mdDialog.hide(answer);
+        };
+        dialog.crearContacto = function(contacto) {
+            contactos.crearContacto(contacto); 
+            $mdDialog.hide();
+        };
+    }
+
 })();

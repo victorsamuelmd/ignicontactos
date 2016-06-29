@@ -38,22 +38,22 @@ class DB
             email varchar(200) not null unique
         );");
 
-        $this->db->exec("create table if not exists contactos (
-            id int primary key auto_increment,
-            nombres varchar(200) not null,
-            apellidos varchar(200) not null,
-            telefono varchar(20),
-            email varchar(200),
-            categoria varchar(40),
-            fecha_nacimiento date,
-            pais varchar(40),
-            departamento varchar(40),
-            ciudad varchar(40),
-            direccion varchar(200),
-            coordenadas varchar(30),
-            notas varchar(700),
-            imagen varchar(38) default '',
-            id_usuario varchar(50) not null
+        $this->db->exec("CREATE TABLE IF NOT EXISTS contactos (
+            id INT PRIMARY KEY AUTO_INCREMENT,
+            nombres VARCHAR(200) NOT NULL,
+            apellidos VARCHAR(200) NOT NULL,
+            telefono VARCHAR(20),
+            email VARCHAR(200),
+            categoria VARCHAR(40),
+            fecha_nacimiento DATE,
+            pais VARCHAR(40),
+            departamento VARCHAR(40),
+            ciudad VARCHAR(40),
+            direccion VARCHAR(200),
+            coordenadas VARCHAR(30),
+            notas VARCHAR(700),
+            imagen VARCHAR(38) DEFAULT '',
+            id_usuario VARCHAR(50) NOT NULL
         );");
     }
     
@@ -103,7 +103,8 @@ class DB
         $stmt = $this->db->prepare("select `username` from usuarios
                                     where `username` = :username
                                     and `password` = :password");
-        $stmt->execute(array('username' => $username, 'password' => hash('sha256', $password)));
+        $stmt->execute(array(
+            'username' => $username, 'password' => hash('sha256', $password)));
         return $stmt->fetch();
     }
 
@@ -115,8 +116,9 @@ class DB
     public function obtener_contacto_todos($username)
     {
         $stmt = $this->db->prepare("select 
-            `nombres`, `apellidos`, `telefono`, `email`, `categoria`, `fecha_nacimiento`,
-            `pais`, `departamento`, `ciudad`, `direccion`, `coordenadas`, `notas`, `id`, `imagen`
+            `nombres`, `apellidos`, `telefono`, `email`, `categoria`,
+            `fecha_nacimiento`, `pais`, `departamento`, `ciudad`, `direccion`,
+            `coordenadas`, `notas`, `id`, `imagen`
             FROM contactos WHERE `id_usuario` = :username");
         $stmt->execute(array('username' => $username));
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -150,7 +152,8 @@ class DB
      */
     public function obtener_contacto($username, $id)
     {
-        $stmt = $this->db->prepare("select * from contactos where `id` = :id and `id_usuario` = :id_usuario");
+        $stmt = $this->db->prepare("select * from contactos
+            where `id` = :id and `id_usuario` = :id_usuario");
         $stmt->execute(array('id' => $id, 'id_usuario' => $username));
         $contacto = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($contacto) {
@@ -167,7 +170,8 @@ class DB
      */
     public function borrar_contacto($username, $id)
     {
-        $stmt = $this->db->prepare("delete from contactos where `id` = :id and `id_usuario` = :id_usuario");
+        $stmt = $this->db->prepare("delete from contactos
+            where `id` = :id and `id_usuario` = :id_usuario");
         $stmt->execute(array('id' => $id, 'id_usuario' => $username));
     }
 
@@ -190,7 +194,8 @@ class DB
     
     
     private function envolver_elementos($list, $pre = '', $pos = '') {
-        return trim(reduce_left($list, function($value, $index, $collection, $reduction) use ($pre, $pos) {
+        return trim(reduce_left($list, function($value, $index, $collection, $reduction)
+            use ($pre, $pos) {
             return $reduction . $pre . $index . $pos;
         }), ",");
     }

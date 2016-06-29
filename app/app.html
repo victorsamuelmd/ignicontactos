@@ -2,94 +2,37 @@
 <html lang="es">
     <head>
         <title>Ignicontactos</title>
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
-        <script src="https://code.angularjs.org/1.5.7/angular-cookies.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/danialfarid-angular-file-upload/12.0.4/ng-file-upload-all.min.js"></script>
-        <script src="ng-map.min.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc.5/angular-material.min.css">
+
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
         <link rel="stylesheet" href="styles.css">
     </head>
-    <body ng-app="ignicontactos">
-                <nav class="purple darker-2">
-                    <div class="nav-wrapper">
-                        <a href="home.php" class="brand-logo"><i class="material-icons left">assignment_ind</i>Ignicontactos</a>
-                        <ul class="right hide-on-med-and-down">
-                            <li class="">Bienvenido <?php echo $_SESSION['username']; ?></li>
-                            <li class=""><a href="logout.php" class="waves-effect waves-light btn">Salir</a></li>
-                        </ul>
-                    </div>
-                </nav>
-
-        <div ng-controller="ContactosListaController as listaContactos" class="container section">
-
-                <div ng-hide="listaContactos.crear">
-                <formulario-contacto contacto="detalle.model.contactoSeleccionado"></formulario-contacto>
-                </div>
-            <div class="row">
-            <div class="col s4">
-                <div class="input-field">
-                    <input type="text" ng-model="filtro" class="">
-                    <label>Buscar</label>
-                </div>
-                <ul class="collection">
-                    <li ng-repeat="contacto in listaContactos.model.lista | filter: filtro">
-                        <a href="#" ng-click="listaContactos.verDetalle(contacto)" class="collection-item">
-                            {{contacto.nombres}} {{contacto.apellidos}}
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <div ng-controller="ContactoDetalleController as detalle" class="col s8">
-                <div ng-if="detalle.model.contactoSeleccionado.nombres">
-                    <div class="card purple lighten-2">
-                        <div ng-if="imagen" class="card-image">
-                            <img ng-src="{{'data:image/png;base64,' + imagen}}"></img>
-                        </div>
-                        <div class="card-content white-text">
-                            <span class="card-title activator grey-text text-darken-4">
-                                {{detalle.model.contactoSeleccionado.nombres}} {{detalle.model.contactoSeleccionado.apellidos}}
-                                <i class="material-icons right">more_vert</i></span>
-                            <p>Telefono: {{detalle.model.contactoSeleccionado.telefono}}</p>
-                            <p>Email: {{detalle.model.contactoSeleccionado.email}}</p>
-                        </div>
-                        <div class="card-reveal">
-                            <span class="card-title grey-text text-darken-4">
-                                {{detalle.model.contactoSeleccionado.nombres}} {{detalle.model.contactoSeleccionado.apellidos}}
-                                <i class="material-icons right">close</i></span>
-                            <p>Cumpleaños: {{detalle.model.contactoSeleccionado.fecha_nacimiento}}</p>
-                            <p>Direccion: {{detalle.model.contactoSeleccionado.pais}} {{detalle.model.contactoSeleccionado.departamento}} {{detalle.model.contactoSeleccionado.ciudad}}
-                                {{detalle.model.contactoSeleccionado.direccion}}
-                            </p>
-                            <p>Categoria: {{detalle.model.contactoSeleccionado.categoria}}</p>
-                            <p>Notas: {{detalle.model.contactoSeleccionado.notas}}</p>
-                            <div ng-if="selectedContacto.direccion">
-                                <div map-lazy-load="https://maps.googleapis.com/maps/api/js?key=AIzaSyCenvVgbTO5zfRsh-8MGKS04rTMOPZur_w">
-                                    <ng-map center="{{selectedContacto.direccion}}" style="height:300px">
-                                        <marker position="bogota, colombia"><marker>
-                                    </ng-map>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-action">
-                            <a ng-click="detalle.borrarContacto(detalle.model.contactoSeleccionado.id)" href="#"><i class="material-icons white-text">delete</i></a>
-                            <a ng-click="detalle.editarContacto()" href="#"><i class="material-icons white-text">mode_edit</i></a>
-                        </div>
-                    </div>
-                </div>
-                <div ng-hide="detalle.editar">
-                <formulario-contacto contacto="detalle.model.contactoSeleccionado"></formulario-contacto>
-                </div>
-            </div>
-            </div>
+    <body ng-app="ignicontactos" ng-cloak ng-controller="AppController as app">
+        <div layout="row">
+            <md-content class="md-padding">
+                <md-nav-bar md-selected-nav-item="currentNavItem" nav-bar-aria-label="navigation links">
+                    <md-nav-item md-nav-click="goto('page1')" name="page1">Ignicontactos</md-nav-item>
+                </md-nav-bar>
+            </md-content>
         </div>
 
-        <div class="fixed-action-btn" style="buttom: 2em; right: 2em;">
-            <a class="btn-floating btn-large waves-effect waves-light red modal-trigger" href="#contacto-form"><i class="material-icons">add</i></a>
-        </div>
+        <contactos-lista></contactos-lista>
+
+        <!-- Libraries -->
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-cookies.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-route.min.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-animate.min.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-aria.min.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-messages.min.js"></script>
+
+        <!-- Angular Material Library -->
+        <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc.5/angular-material.min.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/danialfarid-angular-file-upload/12.0.4/ng-file-upload-all.min.js"></script>
+        <script src="ng-map.min.js"></script>
+
         <script src="app.js"></script>
     </body>
 </html>
