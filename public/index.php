@@ -131,7 +131,12 @@ function main()
 
     $map->get('get.imagen', '/imagen', function ($req, $res) {
         $file = $req->getQueryParams();
-        return new JsonResponse(array('imagen' => obtener_imagen($file['name'])));
+        $imagen = obtener_imagen($file['name']);
+        if ($imagen) {
+            return new JsonResponse(array('imagen' => $imagen ));
+        } else {
+            return new JsonResponse(array('error' => 'No se pudo obtener la imagen'), 404);
+        }
     });
 
     /*
@@ -145,7 +150,11 @@ function main()
     {
         $file = __DIR__ . '/../img/' . $img_name;
         if (file_exists($file)) {
-            return base64_encode(file_get_contents($file));
+            try {
+                return base64_encode(file_get_contents($file));
+            } catch (\Exception $e) {
+                return null; 
+            }
         }
         return null;
     }

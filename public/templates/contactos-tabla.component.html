@@ -1,3 +1,11 @@
+<form>
+    <div class="input-field">
+        <select ng-model="tabla.filtro" class="browser-default">
+            <option ng-repeat="contacto in tabla.contactos | unique: 'categoria' | orderBy: 'categoria'" value="{{contacto.categoria}}">{{contacto.categoria}}</option>
+        </select>
+        <label>Seleccionar categoria</label>
+    </div>
+</form>
 <table>
     <thead>
         <tr>
@@ -6,15 +14,18 @@
             <th>Telefono</th>
             <th>Email</th>
             <th>Categoria</th>
+            <th>Direccion</th>
+            <th>Fecha de Cumpleaños</th>
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="contacto in tabla.contactos">
+        <tr ng-repeat="contacto in tabla.contactos | filter: tabla.filtro">
             <td>{{contacto.nombres}}</td>
             <td>{{contacto.apellidos}}</td>
             <td>{{contacto.telefono}}</td>
             <td>{{contacto.email}}</td>
             <td>{{contacto.categoria}}</td>
+            <td>{{contacto.fecha_nacimiento}}</td>
         </tr>
     </tbody>
 </table>

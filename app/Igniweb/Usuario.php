@@ -81,6 +81,4 @@ class Usuario implements \JsonSerializable
         return $this->username;
     }
     
-    
-
 }

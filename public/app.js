@@ -1,12 +1,12 @@
 (function(){
     'use strict';
 
-    angular.module('ignicontactos', ['ngCookies', 'ngMap', 'ngFileUpload'])
+    angular.module('ignicontactos', ['ngCookies', 'ngMap', 'ngFileUpload', 'angular.filter', 'ngRoute'])
     /*
      * Servicio para manejar contactos, este es el encargado de realizar
      * las peticiones al servidor mediante protocolo http usando un patrón REST
      */
-        .service('contactos', function Contactos($http, $cookies){
+        .service('contactos', function Contactos($http, $cookies, Upload){
             var contactos = this,
                 username = $cookies.get('username');
 
@@ -22,9 +22,7 @@
             contactos.crearContacto = function crearContacto(data) {
                 $http.post('/' + username + '/contacto/nuevo', data)
                     .then(function(response){
-                        data.id = response.data.id;
-                        contactos.model.lista.push(data);
-                        contactos.model.nuevo = {};
+                        console.log(response.data);
                     });
             };
 
@@ -45,54 +43,99 @@
                     });
             };
 
+            contactos.obtenerImagen = function(name) {
+                return $http.get('/imagen', {params: {name: name}})
+                    .then(function(response) {
+                        return response.data;
+                    }, function(error) {
+                        return error;
+                    });
+            }
+
             // TODO: Esta funcion no esta bien estructurada
             contactos.upload = function (file) {
-                Upload.upload({
-                    url: '/' + username + '/images',
-                    data: {file: file, 'username': username}
-                }).then(function (resp) {
-                    $scope.contacto.imagen = resp.data.img;
-                }, function (resp) {
-                    console.log('Error status: ' + resp.status);
-                }, function (evt) {
-                    var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
-                    console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
+                return new Promise(function(resolve, reject) {
+                    Upload.upload({
+                        url: '/' + username + '/images',
+                        data: {file: file, 'username': username}
+                    }).then(function(response){resolve(response.data)},
+                        function(error){reject(error)})
                 });
-            };
+            }
         })
 
 
+    /*
+     * La función de este componente es mantener la vista de la aplicacion
+     * sincronizada con el estado de los datos en el servidor.
+     */
         .component('appRoot', {
             templateUrl: 'templates/app.component.html',
             controllerAs: 'app',
-            controller: function(contactos) {
+            controller: function(contactos, $cookies) {
                 var app = this;
 
+                app.username = $cookies.get('username');
                 app.listaDeContactos = [];
                 app.contactoSeleccionado = {};
+                app.imagen = null;
                 app.contactoEnEdicion = {};
+                app.enEdicion = false;
 
                 app.seleccionarContacto = function(contacto) {
+                    app.imagen = null;
                     app.contactoSeleccionado = contacto;
+                    contactos.obtenerImagen(contacto.imagen).then(
+                            function(data) {
+                                app.imagen = data.imagen;
+                            }, function(error) {
+                                console.log(error);
+                            });
                 };
 
                 app.borrarContacto = function borrarContacto(id) {
                     contactos.borrarContacto(id);
+                    app.$onInit();
+                    app.contactoSeleccionado = null;
                 };
 
                 app.iniciarEdicion = function(contacto) {
+                    $('#contacto-form').openModal();
                     app.contactoEnEdicion = contacto;
+                    app.enEdicion = true;
                 };
 
                 app.crear = function() {
+                    $('#contacto-form').openModal();
                     app.contactoEnEdicion = {};
+                    app.enEdicion = false;
                 };
+
+                app.crearContacto = function(contacto) {
+                    $('#contacto-form').closeModal();
+                    contactos.crearContacto(contacto);
+                    app.$onInit();
+                }
 
                 app.editarContacto = function(contacto) {
+                    $('#contacto-form').closeModal();
                     contactos.actualizarContacto(contacto);
+                    app.$onInit();
                 };
 
+                app.subirImagen = function(file) {
+                    var promise = contactos.upload(file);
+                    var img;
+                    promise.then(function(data) {
+                        img = data.img;
+                        app.contactoEnEdicion.imagen = img;
+                        Materialize.toast('Imagen subida apropiadamente', 4000)
+                    });
+                }
+
                 app.$onInit = function() {
+                    Materialize.updateTextFields();
+                     $('ul.tabs').tabs();
                     contactos.obtenerContactos()
                         .then(function(data) {
                             app.listaDeContactos = data;
@@ -101,6 +144,10 @@
             }
         })
 
+        /*
+         * Este componente muestra los contactos en forma de lista y permite
+         * ver los detalles de cada uno
+         */
         .component('contactoLista', {
             templateUrl: 'templates/contacto-lista.component.html',
             controllerAs: 'lista',
@@ -125,6 +172,9 @@
         })
 
 
+        /*
+         * Recibe lo datos del contacto del cual se quieren ver los detalles
+         */
         .component('contactoDetalle', {
             controllerAs: 'cnt',
             templateUrl: 'templates/contacto-detalle.component.html',
@@ -146,19 +196,24 @@
             },
             bindings: {
                 contacto: '<',
+                imagen: '<',
                 alEditar: '&',
                 alBorrar: '&'
             }
         })
 
 
+        /*
+         * Es usado tanto como para crear nuevos contactos como para editar
+         * los que ya están creados.
+         */
         .component('contactoFormulario', {
             templateUrl: 'templates/contacto.formulario.html',
             controllerAs: 'formulario',
             controller: function (){
                 var formulario = this;
                 formulario.crear = function(contacto) {
-                    formulario.onCreate(contacto);
+                    formulario.alCrear({contacto: contacto});
                     console.log("Funcion llamada con: ", contacto);
                 };
 
@@ -168,23 +223,29 @@
                 };
 
                 formulario.$onInit = function() {
-                    console.log('Formulario inicializado');
-                    console.log(formulario.form);
+                };
+
+                formulario.seleccionarImg = function(file) {
+                    formulario.alSeleccionarImg({file: file});
                 };
             },
             bindings: {
                 contacto: '<',
                 modoEditar: '<',
                 alCrear: '&',
-                alActualizar: '&'
+                alActualizar: '&',
+                alSeleccionarImg: '&'
             }
         })
-
         .component('contactoTabla', {
             templateUrl: 'templates/contactos-tabla.component.html',
             controllerAs: 'tabla',
             controller: function() {
-                
+                var tabla = this;
+               tabla.filtro = ''; 
+               tabla.$onInit = function() {
+                    Materialize.updateTextFields();
+               };
             },
             bindings: {
                 contactos: '<'

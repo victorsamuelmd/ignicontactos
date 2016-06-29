@@ -7,24 +7,42 @@
         </ul>
     </div>
 </nav>
+<ul class="tabs">
+    <li class="tab col s3"><a href="#tab1">Lista</a></li>
+    <li class="tab col s3"><a href="#tab2">Tabla</a></li>
+</ul>
 
-<div class="container">
+<div class="container" id="tab1">
+    <div class="row">
     <contacto-lista 
+         class="col s4"
         lista="app.listaDeContactos" 
         al-seleccionar="app.seleccionarContacto(contacto)">
     </contacto-lista>
     <contacto-detalle
+        class="col s8"
+        imagen="app.imagen"
         al-borrar="app.borrarContacto(id)"
         al-editar="app.iniciarEdicion(contacto)"
         contacto="app.contactoSeleccionado">
     </contacto-detalle>
+    </div>
 
-    <contacto-formulario
-        al-actualizar="app.editarContacto(contacto)"
-        modo-editar="true"
-        contacto="app.contactoEnEdicion">
-    </contacto-formulario>
 </div>
+<div class="row" id="tab2">
+    <contacto-tabla
+                 class="col s12"
+        contactos="app.listaDeContactos">
+    </contacto-tabla>
+</div>
+
+<contacto-formulario
+        al-actualizar="app.editarContacto(contacto)"
+        al-crear="app.crearContacto(contacto)"
+        al-seleccionar-img="app.subirImagen(file)"
+        modo-editar="app.enEdicion"
+        contacto="app.contactoEnEdicion">
+</contacto-formulario>
 
 
 <div class="fixed-action-btn" style="buttom: 2em; right: 2em;">
