@@ -1,5 +1,5 @@
-<div class="" id="contacto-form">
-    <div class="">
+<div ng-show="formulario.contacto.nombres || !formulario.modoEditar" class="container" id="contacto-form" name="formulario.form">
+    <div class="row">
         <form class="col s12">
             <div class="row">
                 <div class="input-field col s4">
@@ -61,12 +61,12 @@
             </div>
 
             <div class="btn-flat" ngf-select="upload($file)" ng-model="file" name="file"
-                                                                             ngf-accept="'image/*'" ngf-max-size="20MB" ngf-min-height="100">
+                 ngf-max-size="20MB" ngf-min-height="100">
                 Imagen de Contacto
             </div>
 
-            <a ng-if="!formulario.editar" ng-click="formulario.crear(contacto)" class="waves-effect waves-light btn"><i class="material-icons right">done</i>Crear</a>
-            <a ng-if="formulario.editar" ng-click="formulario.guardarCambios(formulario.contacto)" class="waves-effect waves-light btn"><i class="material-icons right">done</i>Guardar Cambios</a>
+            <a ng-if="!formulario.modoEditar" ng-click="formulario.crear(contacto)" class="waves-effect waves-light btn"><i class="material-icons right">done</i>Crear</a>
+            <a ng-if="formulario.modoEditar" ng-click="formulario.editar(formulario.contacto)" class="waves-effect waves-light btn"><i class="material-icons right">done</i>Guardar Cambios</a>
         </form>
     </div>
 </div>

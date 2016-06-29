@@ -42,15 +42,7 @@
             contactos.borrarContacto = function borrarContacto(id) {
                 $http.delete('/' + username + '/contacto/' + id)
                     .then(function(){
-                        contactos.model.lista = contactos.model.lista.filter(function(element){
-                            return element.id !== id;
-                        });
-                        contactos.model.contactoSeleccionado = {};
                     });
-            };
-
-            contactos.seleccionarContacto = function seleccionarContacto(data) {
-                contactos.model.contactoSeleccionado = data;
             };
 
             // TODO: Esta funcion no esta bien estructurada
@@ -68,43 +60,67 @@
                 });
             };
         })
+
+
         .component('appRoot', {
             templateUrl: 'templates/app.component.html',
             controllerAs: 'app',
             controller: function(contactos) {
                 var app = this;
 
+                app.listaDeContactos = [];
+                app.contactoSeleccionado = {};
+                app.contactoEnEdicion = {};
+
+                app.seleccionarContacto = function(contacto) {
+                    app.contactoSeleccionado = contacto;
+                };
+
+                app.borrarContacto = function borrarContacto(id) {
+                    contactos.borrarContacto(id);
+                };
+
+                app.iniciarEdicion = function(contacto) {
+                    app.contactoEnEdicion = contacto;
+                };
+
+                app.crear = function() {
+                    app.contactoEnEdicion = {};
+                };
+
+                app.editarContacto = function(contacto) {
+                    contactos.actualizarContacto(contacto);
+                };
+
                 app.$onInit = function() {
-                    console.log('Inicializado el componente de la aplicación');
-                }
+                    contactos.obtenerContactos()
+                        .then(function(data) {
+                            app.listaDeContactos = data;
+                        });
+                };
             }
         })
 
         .component('contactoLista', {
             templateUrl: 'templates/contacto-lista.component.html',
             controllerAs: 'lista',
-            controller: function ContactosListaController(contactos){
+            controller: function ContactosListaController() {
                 var listaContactos = this;
 
-                listaContactos.lista = [];
                 listaContactos.filtro = '';
-                listaContactos.contactoSeleccionado = {};
-
-                listaContactos.verDetalle = function(data){
-                    listaContactos.contactoSeleccionado = data;
-                };
-
-                listaContactos.crearContacto = function(contacto) {
-                    contactos.crearContacto(contacto);
-                }
 
                 listaContactos.$onInit = function() {
                     console.log("Inicializado el componente de lista de Contactos");
-                    contactos.obtenerContactos().then(function(data) {
-                        listaContactos.lista = data;
-                    });
-                }
+                };
 
+                listaContactos.seleccionar = function(contacto) {
+                    listaContactos.alSeleccionar({contacto: contacto});
+                };
+
+            },
+            bindings: {
+                lista: '<',
+                alSeleccionar: '&'
             }
         })
 
@@ -112,27 +128,26 @@
         .component('contactoDetalle', {
             controllerAs: 'cnt',
             templateUrl: 'templates/contacto-detalle.component.html',
-            controller: function ContactoDetalleController(contactos){
+            controller: function ContactoDetalleController(){
                 var detalle = this;
 
-                detalle.editar = true;
-                detalle.contacto = {};
 
-                detalle.borrarContacto = function borrarContacto(id) {
-                    contactos.borrarContacto(id);
+                detalle.borrar = function(contacto) {
+                    detalle.alBorrar({id: contacto.id});
                 };
-                detalle.editarContacto = function editarContacto() {
-                    detalle.editar = false; 
+
+                detalle.editar = function editarContacto(contacto) {
+                    detalle.alEditar({contacto: contacto});
                 };
 
                 detalle.$onChanges = function (changesObj) {
                     detalle.contacto = changesObj.contacto.currentValue;
-                }
+                };
             },
             bindings: {
                 contacto: '<',
-                cntEditar: '&',
-                cntBorrar: '&'
+                alEditar: '&',
+                alBorrar: '&'
             }
         })
 
@@ -145,12 +160,23 @@
                 formulario.crear = function(contacto) {
                     formulario.onCreate(contacto);
                     console.log("Funcion llamada con: ", contacto);
-                }
+                };
+
+                formulario.editar = function(contacto) {
+                    formulario.alActualizar({contacto: contacto});
+                    formulario.contacto = {};
+                };
+
+                formulario.$onInit = function() {
+                    console.log('Formulario inicializado');
+                    console.log(formulario.form);
+                };
             },
             bindings: {
                 contacto: '<',
-                onCreate: '&',
-                onUpdate: '&'
+                modoEditar: '<',
+                alCrear: '&',
+                alActualizar: '&'
             }
         })
 

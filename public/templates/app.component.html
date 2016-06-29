@@ -7,13 +7,27 @@
         </ul>
     </div>
 </nav>
+
 <div class="container">
-            <contacto-lista></contacto-lista>
-    </div>
+    <contacto-lista 
+        lista="app.listaDeContactos" 
+        al-seleccionar="app.seleccionarContacto(contacto)">
+    </contacto-lista>
+    <contacto-detalle
+        al-borrar="app.borrarContacto(id)"
+        al-editar="app.iniciarEdicion(contacto)"
+        contacto="app.contactoSeleccionado">
+    </contacto-detalle>
+
+    <contacto-formulario
+        al-actualizar="app.editarContacto(contacto)"
+        modo-editar="true"
+        contacto="app.contactoEnEdicion">
+    </contacto-formulario>
 </div>
 
 
 <div class="fixed-action-btn" style="buttom: 2em; right: 2em;">
     <a class="btn-floating btn-large waves-effect waves-light red modal-trigger"
-       href="#crear"><i class="material-icons">add</i></a>
+       href="#crear" ng-click="app.crear()"><i class="material-icons">add</i></a>
 </div>
