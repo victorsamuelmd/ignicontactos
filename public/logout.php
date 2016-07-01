@@ -1,6 +1,8 @@
 <?php
 // Initialize the session.
 // If you are using session_name("something"), don't forget it now!
+$lifetime = 60 * 60 * 3;
+session_set_cookie_params($lifetime);
 session_start();
 
 // Unset all of the session variables.

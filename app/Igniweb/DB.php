@@ -21,6 +21,9 @@ class DB
     {
         $this->db = new PDO('mysql:host=localhost;dbname=test', 'root');
         ////$this->db = new PDO('mysql:host=mariadb;dbname=homestead', 'homestead', 'secret');
+        //
+        $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
 
     }
 
@@ -68,8 +71,8 @@ class DB
      */
     public function guardar_usuario(Usuario $user){
         if ( ! $this->obtener_usuario($user->get_username())) {
-            $stmt = $this->db->prepare("insert into usuarios (username,password,email) 
-                values (:username, :password, :email)");
+            $stmt = $this->db->prepare("INSERT INTO usuarios (username,password,email) 
+                VALUES (:username, :password, :email)");
             return $stmt->execute($user->asArray());
         } else {
             throw new InvalidArgumentException("El usuario ya existe");
@@ -144,7 +147,7 @@ class DB
 
     /**
      * Devuelve el usuario especificado con nombre de usuario y id, en caso
-     * de que no exista, devuelve un error de tipo TODO
+     * de que no exista, devuelve null
      *
      * @return Contacto
      */
@@ -152,7 +155,7 @@ class DB
     {
         $stmt = $this->db->prepare("select * from contactos where `id` = :id and `id_usuario` = :id_usuario");
         $stmt->execute(array('id' => $id, 'id_usuario' => $username));
-        $contacto = $stmt->fetch(PDO::FETCH_ASSOC);
+        $contacto = $stmt->fetch();
         if ($contacto) {
             return $contacto;
         } else {
@@ -185,7 +188,8 @@ class DB
         $datos['id'] = $id;
         $sql = "update contactos set $str where id = :id";
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute($datos);
+        $stmt->execute($datos);
+        return $this->obtener_contacto($username, $id);
     }
     
     
@@ -193,6 +197,10 @@ class DB
         return trim(reduce_left($list, function($value, $index, $collection, $reduction) use ($pre, $pos) {
             return $reduction . $pre . $index . $pos;
         }), ",");
+    }
+
+    public function DB(){
+        return $this->db;
     }
 
 }

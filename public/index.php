@@ -1,7 +1,8 @@
 <?php
 
 require_once __DIR__ . '/../vendor/autoload.php';
-use Aura\Router\RouterContainer as RouterContainer;
+
+use Aura\Router\RouterContainer;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\Response\HtmlResponse;
@@ -39,11 +40,14 @@ function main()
 
     $map->post('post.usuario', '/usuario/nuevo', function ($req, $res) use ($db) {
         $usr = json_decode($req->getBody(), true);
+        if (!$usr) {
+            return new JsonResponse(['error' => 'Can not decode the data'], 400);
+        }
         try {
             $usuario = new Usuario($usr['username'], $usr['password'], $usr['email']);
             return new JsonResponse($db->guardar_usuario($usuario));
         } catch (InvalidArgumentException $e) {
-            return new JsonResponse(array('error' => $e->getMessage(), 'data' => $usr), 500);
+            return new JsonResponse(['error' => $e->getMessage(), 'data' => $usr], 500);
         }
     });
 
@@ -63,7 +67,7 @@ function main()
         if ($contacto){
             return new JsonResponse($contacto);
         } else {
-            return new JsonResponse(array("error" => "El contacto con id $id no existe"), 404);
+            return new JsonResponse(["error" => "El contacto con id $id no existe"], 404);
         }
     });
 
@@ -87,9 +91,10 @@ function main()
             if ($id) {
                 return new JsonResponse(array('id' => $id));
             }
-            return new JsonResponse(array('error' => 'Contacto no creado'));
         } catch (InvalidArgumentException $e) {
-            return new JsonResponse(array('error' => $e->getMessage()), 500);
+            return new JsonResponse(array('error' => $e->getMessage()), 400);
+        } catch (PDOException $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 400);
         }
     });
 
@@ -201,10 +206,15 @@ function main()
     }
 }
 
+if (isset($_COOKIE['mantener'])) {
+    $lifetime = 60 * 60 * 3;
+} else {
+    $lifetime = 0;
+}
+session_set_cookie_params($lifetime);
 session_start();
-if (isset($_SESSION['username']) && $_SESSION['username'] != ''){
+if (isset($_SESSION['username']) && $_SESSION['username'] != '' && isset($_COOKIE['username'])){
     main();
 } else {
     echo json_encode(['error' => 'No autorizado']);
 }
-

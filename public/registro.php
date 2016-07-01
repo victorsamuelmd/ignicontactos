@@ -1,4 +1,6 @@
 <?php
+$lifetime = 60 * 60 * 3;
+session_set_cookie_params($lifetime);
 session_start();
 
 require_once __DIR__ . '/../vendor/autoload.php';

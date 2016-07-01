@@ -20,16 +20,20 @@
             };
 
             contactos.crearContacto = function crearContacto(data) {
-                $http.post('/' + username + '/contacto/nuevo', data)
+                return $http.post('/' + username + '/contacto/nuevo', data)
                     .then(function(response){
-                        console.log(response.data);
+                        return response.data;
+                    }, function(error) {
+                        return error;
                     });
             };
 
             contactos.actualizarContacto = function(data){
-                $http.put('/' + username + '/contacto/' + data.id, data)
+                return $http.put('/' + username + '/contacto/' + data.id, data)
                     .then(function(response){
-                        // TODO
+                        return response.data;
+                    }, function(error) {
+                        return error;
                     });
             };
 
@@ -116,8 +120,13 @@
 
                 app.crearContacto = function(contacto) {
                     $('#contacto-form').closeModal();
-                    contactos.crearContacto(contacto);
-                    app.$onInit();
+                    contactos.crearContacto(contacto).then(function(id) {
+                        contacto.id = id;
+                        app.listaDeContactos.push(contacto);
+                        Materialize.toast('Contacto creado exitosamente', 4000);
+                    }, function(error) {
+                        Materialize.toast(error, 4000);
+                    });
                 }
 
                 app.editarContacto = function(contacto) {
@@ -125,8 +134,12 @@
                     if (angular.equals(app.contactoSeleccionado, app.contactoEnEdicion)) {
                         console.log("Son iguales");
                     } else {
-                        contactos.actualizarContacto(contacto);
-                        app.$onInit();
+                        contactos.actualizarContacto(contacto).then(function(data) {
+                            app.contactoSeleccionado = data;
+                            Materialize.toast('Actualizacion correcta', 4000);
+                        }, function(error) {
+                            Materialize.toast('Error al actualizar, si persiste comuniquese con el administrador del sistema', 4000);
+                        });
                     }
                 };
 
@@ -139,6 +152,14 @@
                         Materialize.toast('Imagen subida apropiadamente', 4000)
                     });
                 }
+
+                app.borrarContactos = function(listaParaBorrar) {
+                    listaParaBorrar.forEach(function(id, index, lista) {
+                        console.log('borrando contacto con id:' + id);
+                        contactos.borrarContacto(id);
+                    });
+                    app.$onInit();
+                };
 
                 app.$onInit = function() {
                     Materialize.updateTextFields();
@@ -220,13 +241,21 @@
             controller: function (){
                 var formulario = this;
                 formulario.crear = function(contacto) {
-                    formulario.alCrear({contacto: contacto});
-                    console.log("Funcion llamada con: ", contacto);
+                    if (!formulario.contacto.nombres) {
+                        formulario.error = 'El nombre no puede estar vacío';
+                    } else {
+                        formulario.alCrear({contacto: contacto});
+                        console.log("Funcion llamada con: ", contacto);
+                    }
                 };
 
                 formulario.editar = function(contacto) {
-                    formulario.alActualizar({contacto: contacto});
-                    formulario.contacto = {};
+                    if (!formulario.contacto.nombres) {
+                        Materialize.toast('El nombre de contacto no puede ser vacío');
+                    } else {
+                        formulario.alActualizar({contacto: contacto});
+                        formulario.contacto = {};
+                    }
                 };
 
                 formulario.$onInit = function() {
@@ -250,12 +279,21 @@
             controller: function() {
                 var tabla = this;
                tabla.filtro = ''; 
+               tabla.borrar = function() {
+                   var listaParaBorrar = tabla.contactos.filter(function(contacto) {
+                       return contacto.paraBorrar;
+                   }).map(function(contacto) {
+                       return contacto.id;
+                   });
+                   tabla.borrarContactos({lista: listaParaBorrar});
+               }
                tabla.$onInit = function() {
                     Materialize.updateTextFields();
                };
             },
             bindings: {
-                contactos: '<'
+                contactos: '<',
+                borrarContactos: '&'
             }
         });
 })();

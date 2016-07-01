@@ -1,15 +1,25 @@
 <?php
+
+session_set_cookie_params(3600 * 3);
 session_start();
 
 require_once __DIR__ . '/../vendor/autoload.php';
 use Igniweb\DB;
+
+
 $error = '';
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     $db = new DB();
     $usuario_autentico = $db->validar_usuario($_POST['username'], $_POST['password']);
+
     if ($usuario_autentico){
         $_SESSION['username'] = $_POST['username'];
-        setcookie('username', $_POST['username']);
+        if ($_POST['mantener']){
+            setcookie('username', $_POST['username'], time() + 3600 * 3);
+        } else {
+            setcookie('username', $_POST['username']);
+        }
         header('location: home.php');
     } else {
         $error = "No se pudo autenticar";
@@ -17,7 +27,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 }
 
 ?><!doctype html>
-<?php if (true){ ?>
 <html>
     <head>
         <title>Ignicontactos</title>
@@ -34,6 +43,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
                     <input type="text" placeholder="username" name="username">
                     <input type="password" placeholder="Password" name="password">
                     <input type="submit" value="Autenticar" class="pure-button pure-button-primary">
+                    <label for="mantener" class="pure-checkbox">
+                        Mantener sesion:<input type="checkbox" name="mantener" value="1"/>
+                    </label>
                 </form>
                 <p>
                     <?php echo $error; ?>
@@ -44,4 +56,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
             </div>
         </body>
 </html>
-<?php } ?>

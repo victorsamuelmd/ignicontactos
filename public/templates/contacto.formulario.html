@@ -1,13 +1,16 @@
 <div class="container modal" id="contacto-form" name="formulario.form">
     <div class="row">
         <form class="col s12">
+            <div class="row center-align" ng-if="formulario.error">
+                <p class="center-align">{{formulario.error}}</p>
+            </div>
             <div class="row">
                 <div class="input-field col s4">
-                    <input ng-model="formulario.contacto.nombres" type="text" placeholder="Nombres" class="validate">
+                    <input ng-model="formulario.contacto.nombres" type="text" placeholder="Nombres" class="validate" name="nombres">
                     <label for="formulario.contacto.nombres">Nombres:</label>
                 </div>
                 <div class="input-field col s4">
-                    <input ng-model="formulario.contacto.apellidos" type="text" placeholder="Apellidos" class="validate">
+                    <input ng-model="formulario.contacto.apellidos" type="text" placeholder="Apellidos" class="validate" name="apellidos">
                     <label for="formulario.contacto.apellidos">Apellidos:</label>
                 </div>
                 <div class="input-field col s4">
